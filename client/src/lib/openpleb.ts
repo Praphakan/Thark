@@ -6,7 +6,7 @@ import { secp256k1 } from "@noble/curves/secp256k1";
 import { bytesToHex } from "@noble/hashes/utils";
 import { mmkv } from "./mmkv";
 import { payLightningInvoice, bolt11Invoice } from "./paymentsApi";
-import { Wallet, Mint, getDecodedToken } from "@cashu/cashu-ts";
+import { Wallet, Mint, getDecodedToken, getTokenMetadata } from "@cashu/cashu-ts";
 
 // ── Configuration du serveur ────────────────────────────────
 export const OPENPLEB_BASE_URL = "https://2-58-82-83.sslip.io";
@@ -158,7 +158,13 @@ async function cashuFetch<T = unknown>(args: any): Promise<T> {
 
 export async function redeemRefundToken(refundToken: string): Promise<number> {
   // 1. Décoder le token (mint + proofs)
-  const decoded = getDecodedToken(refundToken, []);
+  // Nouveau format de keyset : le jeton ne contient qu'un ID abrégé,
+  // il faut la liste des keysets du mint pour le décoder.
+  const meta = getTokenMetadata(refundToken);
+  const ksRes = await fetch(`${meta.mint.replace(/\/$/, "")}/v1/keysets`);
+  if (!ksRes.ok) throw new Error(`Keysets du mint indisponibles (HTTP ${ksRes.status})`);
+  const ksIds: string[] = (await ksRes.json()).keysets.map((k: any) => k.id);
+  const decoded = getDecodedToken(refundToken, ksIds);
   const mintUrl = decoded.mint;
   if (!mintUrl) throw new Error("Pas de mint dans le token: " + JSON.stringify(Object.keys(decoded)));
   const proofs = decoded.proofs;
