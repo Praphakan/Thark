@@ -168,7 +168,7 @@ const buildSections = (arkInfo: BarkArkInfo) => [
       { label: t("ark.roundInterval"), value: arkInfo.round_interval, unit: "seconds" },
       { label: t("ark.roundNonces"), value: arkInfo.nb_round_nonces },
       { label: "VTXO exit delta", value: arkInfo.vtxo_exit_delta, unit: "blocks" },
-      { label: "VTXO expiry delta", value: arkInfo.vtxo_expiry_delta, unit: "blocks" },
+      { label: "VTXO expiry delta", value: arkInfo.vtxo_lifetime, unit: "blocks" },
       { label: "HTLC send expiry delta", value: arkInfo.htlc_send_expiry_delta, unit: "blocks" },
     ],
   },

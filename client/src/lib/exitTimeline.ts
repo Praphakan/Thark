@@ -24,6 +24,7 @@ export const EXIT_STATE_LABELS: Record<ExitProgressState, string> = {
   ClaimInProgress: "Claiming",
   Claimed: "Claimed",
   VtxoAlreadySpent: "Already spent",
+  Canceled: "Canceled",
 };
 
 export type ExitDetailRow = {
@@ -287,11 +288,11 @@ export const buildExitTimelineItems = ({
     if (previous?.state === state) {
       previous.count += 1;
       previous.endHeight = height ?? previous.endHeight;
-      previous.description = getTimelineDescription({
+      previous.description = (getTimelineDescription({
         state,
         details: stateDetails,
         currentBlockHeight,
-      });
+      }) ?? "");
       previous.details = getExitBlockRows({ state, details: stateDetails, currentBlockHeight });
       previous.isCurrent = index === states.length - 1;
       continue;
@@ -303,7 +304,7 @@ export const buildExitTimelineItems = ({
       count: 1,
       startHeight: height,
       endHeight: height,
-      description: getTimelineDescription({ state, details: stateDetails, currentBlockHeight }),
+      description: getTimelineDescription({ state, details: stateDetails, currentBlockHeight }) ?? "",
       details: getExitBlockRows({ state, details: stateDetails, currentBlockHeight }),
       isCurrent: index === states.length - 1,
     });

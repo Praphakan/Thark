@@ -172,6 +172,7 @@ const PHASE_LABELS: Record<ExitProgressState, string> = {
   ClaimInProgress: "Claim",
   Claimed: "Done",
   VtxoAlreadySpent: "Spent",
+  Canceled: "Canceled",
 };
 
 const ExitPhaseRail = ({
@@ -650,6 +651,7 @@ const UnilateralExitScreen = () => {
       ClaimInProgress: 0,
       Claimed: 0,
       VtxoAlreadySpent: 0,
+      Canceled: 0,
     },
   );
   const claimInProgressCount = stateCounts.ClaimInProgress;
