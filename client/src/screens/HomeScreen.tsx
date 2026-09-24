@@ -12,7 +12,8 @@ import { NoahActivityIndicator } from "../components/ui/NoahActivityIndicator";
 import { useBalance, useLoadWallet, useWalletSync } from "../hooks/useWallet";
 import Icon from "@react-native-vector-icons/ionicons";
 import { APP_VARIANT } from "~/config";
-import { BITCOIN_FACTS, PLATFORM } from "~/constants";
+import { t } from "~/lib/i18n";
+import { PLATFORM } from "~/constants";
 import { useAppVersionCheck } from "~/hooks/useAppVersionCheck";
 import { UpdateWarningBanner } from "~/components/UpdateWarningBanner";
 import { EmailVerificationBanner } from "~/components/EmailVerificationBanner";
@@ -85,7 +86,6 @@ const HomeScreen = () => {
   const fiatCurrencyInfo = getFiatCurrencyInfo(fiatCurrency);
   const { data: btcToFiatRate, isLoading: isRateLoading } = useBtcToFiatRate();
   const [isOpen, setIsOpen] = useState(false);
-  const [fact, setFact] = useState("");
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [isTransactionSheetOpen, setIsTransactionSheetOpen] = useState(false);
   const bottomTabBarHeight = useBottomTabBarHeight();
@@ -101,8 +101,6 @@ const HomeScreen = () => {
   }, [navigation]);
 
   const getRandomFact = useCallback(() => {
-    const randomIndex = Math.floor(Math.random() * BITCOIN_FACTS.length);
-    setFact(BITCOIN_FACTS[randomIndex]);
   }, []);
 
   useEffect(() => {
@@ -197,29 +195,24 @@ const HomeScreen = () => {
     >
       <View className="flex-row items-center justify-between p-4">
         <Pressable onPress={() => navigation.navigate("BoardArk")}>
-          <Icon name="boat" size={28} color={iconColor} />
+          <Text className="text-3xl font-bold text-foreground">
+            Th<Text className="text-3xl font-bold" style={{ color: COLORS.BITCOIN_ORANGE }}>â</Text>rk
+          </Text>
         </Pressable>
         <View className="flex-1 items-center">
           {APP_VARIANT !== "mainnet" && (
-            <View className="rounded-md bg-yellow-400 px-2 py-1">
-              <Text className="text-xs font-bold uppercase text-black">{APP_VARIANT}</Text>
+            <View className="rounded-full bg-card px-2.5 py-1">
+              <Text className="text-xs font-medium uppercase text-muted-foreground">{APP_VARIANT}</Text>
             </View>
           )}
         </View>
         <View className="flex-row items-center gap-4">
           <Pressable
-            onPress={() => navigation.navigate("QRHub")}
-            accessibilityRole="button"
-            accessibilityLabel="Open QR code"
-          >
-            <Icon name="qr-code-outline" size={28} color={iconColor} />
-          </Pressable>
-          <Pressable
             onPress={() => navigation.navigate("Settings")}
             accessibilityRole="button"
             accessibilityLabel="Open settings"
           >
-            <Icon name="settings-outline" size={28} color={iconColor} />
+            <Icon name="settings-outline" size={26} color={iconColor} />
           </Pressable>
         </View>
       </View>
@@ -239,18 +232,8 @@ const HomeScreen = () => {
           />
         }
       >
-        {isUpdateRequired && (
-          <UpdateWarningBanner
-            currentVersion={currentVersion}
-            minimumVersion={minimumVersion || "0.0.1"}
-          />
-        )}
-        {!isEmailVerified && !isEmailPromptDismissed && (
-          <EmailVerificationBanner
-            onPress={handleEmailVerificationPress}
-            onDismiss={() => setEmailPromptDismissed(true)}
-          />
-        )}
+        {/* UpdateWarningBanner retiré (Thârk) */}
+        {/* EmailVerificationBanner retiré (Thârk) */}
         <BackupStatusBanner />
         <PendingRoundStatusBanner />
         <AutoBoardingStatusBanner />
@@ -293,15 +276,21 @@ const HomeScreen = () => {
                       <NoahActivityIndicator />
                     </View>
                   )}
-                  <View className="relative flex-row items-center justify-center">
+                  <View className="flex-row items-center justify-center px-4">
                     <Pressable
                       accessibilityRole="button"
                       accessibilityLabel="Toggle balance details"
                       accessibilityState={{ expanded: isOpen }}
                       onPress={() => setIsOpen((current) => !current)}
+                      style={{ flexShrink: 1 }}
                     >
                       <View className="flex-row items-center space-x-2">
-                        <Text className="text-4xl font-bold">
+                        <Text
+                          numberOfLines={1}
+                          adjustsFontSizeToFit
+                          className="text-6xl font-semibold tracking-tight"
+                          style={{ flexShrink: 1 }}
+                        >
                           {formatHomeBalance(totalBalance)}
                         </Text>
                         <Animated.View style={animatedRotation}>
@@ -316,7 +305,7 @@ const HomeScreen = () => {
                         isHomeBalanceHidden ? "Show wallet balance" : "Hide wallet balance"
                       }
                       hitSlop={12}
-                      className="absolute -right-9 h-8 w-8 items-center justify-center"
+                      className="ml-3 h-8 w-8 items-center justify-center"
                     >
                       {isHomeBalanceHidden ? (
                         <Eye color={iconColor} size={18} />
@@ -332,6 +321,39 @@ const HomeScreen = () => {
                       </Text>
                     </View>
                   )}
+                </View>
+
+                {/* Boutons d'action Thârk */}
+                <View className="flex-row justify-center gap-3 mt-8 px-1">
+                  <Pressable
+                    className="flex-1 items-center py-5 rounded-2xl bg-card"
+                    onPress={() => navigation.navigate("Receive")}
+                    accessibilityRole="button"
+                    accessibilityLabel="Recevoir"
+                  >
+                    <Icon name="arrow-down" size={26} color={COLORS.BITCOIN_ORANGE} />
+                    <Text className="mt-2 text-sm font-semibold">{t("home.receive")}</Text>
+                  </Pressable>
+
+                  <Pressable
+                    className="flex-1 items-center py-5 rounded-2xl bg-card"
+                    onPress={() => navigation.navigate("Send", {})}
+                    accessibilityRole="button"
+                    accessibilityLabel="Envoyer"
+                  >
+                    <Icon name="arrow-up" size={26} color={COLORS.BITCOIN_ORANGE} />
+                    <Text className="mt-2 text-sm font-semibold">{t("home.send")}</Text>
+                  </Pressable>
+
+                  <Pressable
+                    className="flex-1 items-center py-5 rounded-2xl bg-card"
+                    onPress={() => navigation.navigate("QRHub", { startScan: true })}
+                    accessibilityRole="button"
+                    accessibilityLabel="QR Thaï"
+                  >
+                    <Icon name="qr-code-outline" size={26} color={COLORS.BITCOIN_ORANGE} />
+                    <Text className="mt-2 text-sm font-semibold">{t("home.thaiQr")}</Text>
+                  </Pressable>
                 </View>
                 {isOpen && (
                   <Animated.View entering={FadeInDown} exiting={FadeOutDown}>
@@ -409,9 +431,9 @@ const HomeScreen = () => {
               <View className="gap-4">
                 <View className="rounded-[18px] border border-border/60 bg-card/70 px-4 py-4">
                   <View className="mb-3 flex-row items-center justify-between">
-                    <Text className="text-base font-bold text-foreground">Recent Activity</Text>
+                    <Text className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("home.activity")}</Text>
                     <Pressable onPress={openHistory}>
-                      <Text className="text-sm font-semibold text-primary">View all</Text>
+                      <Text className="text-sm font-semibold" style={{ color: COLORS.BITCOIN_ORANGE }}>{t("home.seeAll")}</Text>
                     </Pressable>
                   </View>
 
@@ -421,9 +443,9 @@ const HomeScreen = () => {
                     </View>
                   ) : recentTransactions.length === 0 ? (
                     <View className="py-5">
-                      <Text className="text-sm font-semibold text-foreground">No activity yet</Text>
+                      <Text className="text-sm font-semibold text-foreground">{t("home.noActivity")}</Text>
                       <Text className="mt-1 text-sm text-muted-foreground">
-                        Receive or send bitcoin to start your history.
+                        Recevez ou envoyez des bitcoins pour commencer.
                       </Text>
                     </View>
                   ) : (
@@ -439,7 +461,7 @@ const HomeScreen = () => {
                           <Icon
                             name={getTransactionIcon(transaction.type)}
                             size={20}
-                            color={transaction.direction === "outgoing" ? "#ef4444" : "#22c55e"}
+                            color={transaction.direction === "outgoing" ? COLORS.BITCOIN_ORANGE : "#22c55e"}
                           />
                         </View>
                         <View className="min-w-0 flex-1">
@@ -470,7 +492,6 @@ const HomeScreen = () => {
           )}
         </View>
         <View className="p-4 items-center justify-center mb-16" style={{ marginTop: "auto" }}>
-          <Text className="text-center text-xs text-muted-foreground">{fact}</Text>
         </View>
       </ScrollView>
       {selectedTransaction ? (

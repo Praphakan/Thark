@@ -806,7 +806,7 @@ const BoardArkScreen = () => {
                           Use an external address
                         </Text>
                         <Text className="mt-0.5 text-xs leading-4 text-amber-700/90 dark:text-amber-200/90">
-                          Sending to your Noah wallet address can board the funds back into Ark.
+                          Sending to your Thârk wallet address can board the funds back into Ark.
                         </Text>
                       </View>
                     </View>

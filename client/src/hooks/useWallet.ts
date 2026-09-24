@@ -28,6 +28,7 @@ import { useTransactionStore } from "../store/transactionStore";
 import { useBackupStore } from "~/store/backupStore";
 import { ResultAsync } from "neverthrow";
 import logger from "~/lib/log";
+import { processPendingRefunds } from "~/lib/openpleb";
 
 const log = logger("useWallet");
 
@@ -62,6 +63,9 @@ export function useLoadWallet() {
     onSuccess: (walletExists) => {
       if (walletExists) {
         setWalletLoaded();
+        // Récupérer automatiquement les remboursements en attente
+        // (offres payées sans preneur, même si l'app avait été fermée)
+        void processPendingRefunds().catch(() => {});
       }
     },
     onError: (error: Error) => {

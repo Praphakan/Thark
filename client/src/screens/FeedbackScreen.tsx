@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import Constants from "expo-constants";
 import * as Device from "expo-device";
 import { File } from "expo-file-system";
@@ -89,19 +90,19 @@ const FeedbackScreen = () => {
 
     const asset = result.assets[0];
     if (asset.fileSize !== undefined && asset.fileSize > MAX_SCREENSHOT_BYTES) {
-      setErrorMessage("Screenshot must be 5 MB or smaller.");
+      setErrorMessage(t("fb.screenshotSize"));
       return;
     }
 
     const base64Data = asset.base64 ?? (await readBase64FromFile(asset.uri));
     if (!base64Data) {
-      setErrorMessage("Could not read the selected screenshot.");
+      setErrorMessage(t("fb.screenshotRead"));
       return;
     }
 
     const contentType = normalizeImageContentType(asset.mimeType);
     if (!contentType) {
-      setErrorMessage("Screenshot must be a JPEG or PNG image.");
+      setErrorMessage(t("fb.screenshotType"));
       return;
     }
 
@@ -151,7 +152,7 @@ const FeedbackScreen = () => {
     if (result.isErr()) {
       log.e("Failed to submit feedback", [result.error]);
       setSubmitState("idle");
-      setErrorMessage("Failed to submit feedback. Please try again.");
+      setErrorMessage(t("fb.submitFailed"));
       return;
     }
 
@@ -183,7 +184,7 @@ const FeedbackScreen = () => {
               <Icon name="arrow-back-outline" size={22} color={iconColor} />
             </Pressable>
             <View className="flex-1">
-              <Text className="text-2xl font-bold text-foreground">Send Feedback</Text>
+              <Text className="text-2xl font-bold text-foreground">{t("fb.title")}</Text>
               <Text className="mt-1 text-sm text-muted-foreground">
                 Report a bug or share what would make Noah better.
               </Text>
@@ -193,12 +194,12 @@ const FeedbackScreen = () => {
           {submitState === "success" ? (
             <View className="flex-1 items-center justify-center px-3 py-10">
               <CheckCircle size={56} color={COLORS.SUCCESS} />
-              <Text className="mt-5 text-center text-2xl font-bold text-foreground">Thank You</Text>
+              <Text className="mt-5 text-center text-2xl font-bold text-foreground">{t("fb.thankYou")}</Text>
               <Text className="mt-2 text-center text-base text-muted-foreground">
                 Your feedback was sent to the Noah team.
               </Text>
               <NativeNoahButton
-                label="Done"
+                label={t("fb.done")}
                 className="mt-8"
                 fullWidth
                 onPress={() => navigation.goBack()}
@@ -213,13 +214,13 @@ const FeedbackScreen = () => {
                 </View>
               ) : null}
 
-              <InputGroup label="Name">
+              <InputGroup label={t("fb.name")}>
                 <ExpoInputHost height={48}>
                   <ExpoTextInput
                     ref={nameInputRef}
                     defaultValue={name}
                     onChangeText={setName}
-                    placeholder="Your name"
+                    placeholder={t("fb.phName")}
                     placeholderTextColor={colors.mutedForeground}
                     autoCorrect={false}
                     editable={submitState === "idle"}
@@ -239,13 +240,13 @@ const FeedbackScreen = () => {
                 </ExpoInputHost>
               </InputGroup>
 
-              <InputGroup label="Email (Optional)">
+              <InputGroup label={t("fb.emailOptional")}>
                 <ExpoInputHost height={48}>
                   <ExpoTextInput
                     ref={emailInputRef}
                     defaultValue={email}
                     onChangeText={setEmail}
-                    placeholder="you@example.com"
+                    placeholder={t("fb.phEmail")}
                     placeholderTextColor={colors.mutedForeground}
                     keyboardType="email-address"
                     autoCapitalize="none"
@@ -267,13 +268,13 @@ const FeedbackScreen = () => {
                 </ExpoInputHost>
               </InputGroup>
 
-              <InputGroup label="Subject">
+              <InputGroup label={t("fb.subject")}>
                 <ExpoInputHost height={48}>
                   <ExpoTextInput
                     ref={subjectInputRef}
                     defaultValue={subject}
                     onChangeText={setSubject}
-                    placeholder="Short summary"
+                    placeholder={t("fb.phSubject")}
                     placeholderTextColor={colors.mutedForeground}
                     maxLength={150}
                     editable={submitState === "idle"}
@@ -293,13 +294,13 @@ const FeedbackScreen = () => {
                 </ExpoInputHost>
               </InputGroup>
 
-              <InputGroup label="Body">
+              <InputGroup label={t("fb.body")}>
                 <ExpoInputHost height={150}>
                   <ExpoTextInput
                     ref={bodyInputRef}
                     defaultValue={body}
                     onChangeText={setBody}
-                    placeholder="Describe the bug or share your feedback..."
+                    placeholder={t("fb.phBody")}
                     placeholderTextColor={colors.mutedForeground}
                     multiline
                     numberOfLines={6}
@@ -366,8 +367,8 @@ const FeedbackScreen = () => {
               )}
 
               <NativeNoahButton
-                label="Send Feedback"
-                loadingLabel="Sending..."
+                label={t("fb.sendButton")}
+                loadingLabel={t("fb.sending")}
                 isLoading={submitState === "submitting"}
                 disabled={isSubmitDisabled}
                 fullWidth

@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import React, { useEffect, useState } from "react";
 import { View, Pressable } from "react-native";
 import { Text } from "~/components/ui/text";
@@ -79,7 +80,7 @@ const UnifiedPushScreen = () => {
           // Register with backend
           registerUnifiedPushTokenWithServer(ep).then((res) => {
             if (res.isErr()) {
-              log.e("Failed to register with Noah server", [res.error]);
+              log.e(t("up.registerFailed"), [res.error]);
             }
           });
         }
@@ -123,7 +124,7 @@ const UnifiedPushScreen = () => {
             </Pressable>
           )}
           <Text className="text-2xl font-bold text-foreground">
-            {fromOnboarding ? "UnifiedPush Setup" : "UnifiedPush"}
+            {fromOnboarding ? t("up.setup") : "UnifiedPush"}
           </Text>
         </View>
 
@@ -134,7 +135,7 @@ const UnifiedPushScreen = () => {
           </Text>
 
           <View className="mb-4">
-            <Text className="font-bold mb-2">Select Distributor</Text>
+            <Text className="font-bold mb-2">{t("up.selectDistributor")}</Text>
             {distributors.length === 0 ? (
               <Text className="text-sm text-muted-foreground">
                 No distributors detected. Install ntfy or another UnifiedPush distributor.
@@ -162,13 +163,13 @@ const UnifiedPushScreen = () => {
           </View>
 
           <View className="mb-4">
-            <Text className="font-bold mb-2">Current Endpoint:</Text>
+            <Text className="font-bold mb-2">{t("up.currentEndpoint")}</Text>
             <Text className="text-xs bg-secondary p-2 rounded text-secondary-foreground font-mono">
-              {endpoint || "Not registered"}
+              {endpoint || t("up.notRegistered")}
             </Text>
             {endpoint ? (
               <NativeNoahButton
-                label="Copy Endpoint"
+                label={t("up.copyEndpoint")}
                 onPress={copyToClipboard}
                 className="mt-2"
                 fullWidth
@@ -179,15 +180,15 @@ const UnifiedPushScreen = () => {
           {fromOnboarding ? (
             <View className="flex-row items-center gap-4">
               <View className="flex-1">
-                <NativeNoahSecondaryButton label="Skip" onPress={handleSkip} fullWidth />
+                <NativeNoahSecondaryButton label={t("up.skip")} onPress={handleSkip} fullWidth />
               </View>
               <View className="flex-1">
                 {status === "idle" || status === "error" ? (
-                  <NativeNoahButton label="Register" onPress={handleRegister} fullWidth />
+                  <NativeNoahButton label={t("up.register")} onPress={handleRegister} fullWidth />
                 ) : status === "registering" ? (
-                  <NativeNoahButton label="Registering..." disabled fullWidth />
+                  <NativeNoahButton label={t("up.registering")} disabled fullWidth />
                 ) : (
-                  <NativeNoahButton label="Continue" onPress={handleContinue} fullWidth />
+                  <NativeNoahButton label={t("up.continue")} onPress={handleContinue} fullWidth />
                 )}
               </View>
             </View>
@@ -195,14 +196,14 @@ const UnifiedPushScreen = () => {
             <>
               {status === "idle" || status === "error" ? (
                 <NativeNoahButton
-                  label="Register with UnifiedPush"
+                  label={t("up.registerWith")}
                   onPress={handleRegister}
                   fullWidth
                 />
               ) : status === "registering" ? (
-                <NativeNoahButton label="Registering..." disabled fullWidth />
+                <NativeNoahButton label={t("up.registering")} disabled fullWidth />
               ) : (
-                <NativeNoahButton label="Done" onPress={handleContinue} fullWidth />
+                <NativeNoahButton label={t("up.done")} onPress={handleContinue} fullWidth />
               )}
             </>
           )}

@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { View, AppState, AppStateStatus, StyleSheet } from "react-native";
 import { Text } from "./ui/text";
@@ -29,7 +30,7 @@ const BiometricGate: React.FC<BiometricGateProps> = ({ children }) => {
     isAuthenticatingRef.current = true;
     setIsAuthenticating(true);
 
-    const result = await authenticate("Authenticate to unlock Noah");
+    const result = await authenticate(t("bio.unlock"));
 
     isAuthenticatingRef.current = false;
     setIsAuthenticating(false);

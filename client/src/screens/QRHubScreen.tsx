@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Pressable, ScrollView, View } from "react-native";
-import { useIsFocused, useNavigation } from "@react-navigation/native";
+import { Alert, Pressable, ScrollView, View } from "react-native";
+import { useIsFocused, useNavigation, useRoute } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Icon from "@react-native-vector-icons/ionicons";
 import QRCode from "react-native-qrcode-svg";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useBottomTabBarHeight } from "react-native-bottom-tabs";
 import { QRCodeScanner } from "~/components/QRCodeScanner";
+import { t } from "~/lib/i18n";
 import { NoahSafeAreaView } from "~/components/NoahSafeAreaView";
 import { NativeNoahButton } from "~/components/ui/NativeNoahButton";
 import { Text } from "~/components/ui/text";
@@ -16,10 +17,11 @@ import { useIconColor } from "~/hooks/useTheme";
 import { useServerStore } from "~/store/serverStore";
 import { useProfileStore } from "~/store/profileStore";
 import { copyToClipboard } from "~/lib/clipboardUtils";
+import { isPromptPayQR, parsePromptPay } from "~/lib/promptpay";
 import { COLORS } from "~/lib/styleConstants";
 import { PLATFORM } from "~/constants";
 import { cn } from "~/lib/utils";
-import logoImage from "../../assets/All_Files/light_dark_tinted/icon_clear_tinted_ios.png";
+import logoImage from "../../assets/thark/logo_qr.png";
 
 type QRMode = "scan" | "my-code";
 
@@ -28,12 +30,14 @@ const addAddressBreakOpportunities = (address: string) =>
 
 const QRHubScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
+  const route = useRoute();
+  const startScan = (route.params as { startScan?: boolean } | undefined)?.startScan ?? false;
   const isFocused = useIsFocused();
   const iconColor = useIconColor();
   const tabBarHeight = useBottomTabBarHeight();
   const lightningAddress = useServerStore((state) => state.lightningAddress);
   const displayName = useProfileStore((state) => state.displayName);
-  const [mode, setMode] = useState<QRMode>("my-code");
+  const [mode, setMode] = useState<QRMode>(startScan ? "scan" : "my-code");
   const [copied, setCopied] = useState(false);
   const displayLightningAddress = lightningAddress
     ? addAddressBreakOpportunities(lightningAddress)
@@ -41,7 +45,41 @@ const QRHubScreen = () => {
 
   const handleScannerValue = (value: string) => {
     setMode("my-code");
-    navigation.navigate("Send", { destination: value });
+    const v = value.trim();
+
+    // 1. QR PromptPay thaï -> écran QR Thaï
+    if (isPromptPayQR(v)) {
+      navigation.navigate("Home", {
+        screen: "PayThaiQR",
+        params: { qrData: v },
+      });
+      return;
+    }
+
+    // 2. Destination Bitcoin / Lightning valide -> écran Envoyer
+    const lower = v.toLowerCase();
+    const looksBitcoin =
+      lower.startsWith("bitcoin:") ||
+      lower.startsWith("lightning:") ||
+      lower.startsWith("lnbc") ||
+      lower.startsWith("lntb") ||
+      lower.startsWith("lntbs") ||
+      lower.startsWith("lnurl") ||
+      lower.startsWith("bc1") ||
+      lower.startsWith("tb1") ||
+      lower.startsWith("ark") ||
+      lower.startsWith("tark") ||
+      lower.includes("@"); // adresse Lightning
+    if (looksBitcoin) {
+      navigation.navigate("Send", { destination: v });
+      return;
+    }
+
+    // 3. Rien de reconnu -> message clair
+    Alert.alert(
+      "QR non reconnu",
+      t("qr.notValid"),
+    );
   };
 
   const { showCamera, setShowCamera, handleScanPress, codeScanner } = useQRCodeScanner({
@@ -87,6 +125,11 @@ const QRHubScreen = () => {
         codeScanner={codeScanner}
         onClose={handleScannerClose}
         onPaste={handlePasteFromScanner}
+      logo={logoImage}
+      logoSize={54}
+      logoBackgroundColor="white"
+      logoMargin={5}
+      logoBorderRadius={12}
       />
     );
   }
@@ -143,7 +186,7 @@ const QRHubScreen = () => {
                   ellipsizeMode="tail"
                   maxFontSizeMultiplier={1.2}
                 >
-                  {item === "my-code" ? "My code" : "Scan"}
+                  {item === "my-code" ? t("qr.myCode") : t("qr.scan")}
                 </Text>
               </Pressable>
             ))}
@@ -159,11 +202,6 @@ const QRHubScreen = () => {
                       size={230}
                       backgroundColor="white"
                       color="black"
-                      logo={logoImage}
-                      logoSize={54}
-                      logoBackgroundColor="white"
-                      logoMargin={5}
-                      logoBorderRadius={12}
                       ecl="H"
                     />
                   </View>
@@ -180,22 +218,22 @@ const QRHubScreen = () => {
                         maxFontSizeMultiplier={1.2}
                         style={{ color: copied ? COLORS.SUCCESS : COLORS.BITCOIN_ORANGE }}
                       >
-                        {copied ? "Copied" : displayLightningAddress}
+                        {copied ? t("recv.copied") : displayLightningAddress}
                       </Text>
                     </Pressable>
                   </View>
 
                   <Text className="mt-5 max-w-[300px] text-center text-sm leading-6 text-muted-foreground">
-                    This QR contains only your Lightning address.
+                    {t("qr.onlyLnAddress")}
                   </Text>
                 </>
               ) : (
                 <View className="w-full rounded-[18px] border border-border/60 bg-card/70 px-4 py-5">
                   <Text className="text-lg font-semibold text-foreground">
-                    Lightning address unavailable
+                    Adresse Lightning indisponible
                   </Text>
                   <Text className="mt-2 text-sm leading-6 text-muted-foreground">
-                    Finish setting up your Lightning address before sharing your QR.
+                    Configurez votre adresse Lightning avant de partager votre QR.
                   </Text>
                   <NativeNoahButton
                     label="Open Profile"
@@ -212,9 +250,9 @@ const QRHubScreen = () => {
                 <View className="h-16 w-16 items-center justify-center rounded-full bg-primary/10">
                   <Icon name="scan-outline" size={30} color={COLORS.BITCOIN_ORANGE} />
                 </View>
-                <Text className="mt-5 text-xl font-bold text-foreground">Scan to pay</Text>
+                <Text className="mt-5 text-xl font-bold text-foreground">{t("qr.scanToPay")}</Text>
                 <Text className="mt-2 max-w-[280px] text-center text-sm leading-6 text-muted-foreground">
-                  Scan a Bitcoin, Lightning, or Ark QR code and send from Noah.
+                  Scan a Bitcoin, Lightning, or Ark QR code and send from Thârk.
                 </Text>
               </View>
             </Animated.View>

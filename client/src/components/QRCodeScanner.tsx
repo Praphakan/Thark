@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import React from "react";
 import { View, Pressable, StyleSheet } from "react-native";
 import { Camera, CodeScanner, useCameraDevice } from "react-native-vision-camera";
@@ -60,7 +61,7 @@ export const QRCodeScanner = ({ codeScanner, onClose, onPaste }: QRCodeScannerPr
               >
                 <View className="flex-row items-center justify-center space-x-2">
                   <Icon name="clipboard" size={28} color="white" />
-                  <Text className="text-white text-lg font-semibold ml-2">Paste</Text>
+                  <Text className="text-white text-lg font-semibold ml-2">{t("scan.paste")}</Text>
                 </View>
               </Pressable>
             ) : null}
@@ -70,7 +71,7 @@ export const QRCodeScanner = ({ codeScanner, onClose, onPaste }: QRCodeScannerPr
             >
               <View className="flex-row items-center justify-center space-x-2">
                 <Icon name="close-circle" size={28} color="white" />
-                <Text className="text-white text-lg font-semibold ml-2">Close</Text>
+                <Text className="text-white text-lg font-semibold ml-2">{t("scan.close")}</Text>
               </View>
             </Pressable>
           </View>

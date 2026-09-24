@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import React from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -39,7 +40,7 @@ const formatNumber = (value: number) => value.toLocaleString();
 
 const formatValue = (value: ArkInfoValue, unit?: string) => {
   if (typeof value === "boolean") {
-    return value ? "Required" : "Not required";
+    return value ? t("ark.required") : t("ark.notRequired");
   }
 
   if (typeof value === "number") {
@@ -115,7 +116,7 @@ const InfoSection = ({ title, rows }: { title: string; rows: InfoRow[] }) => {
                   className="text-xs font-semibold uppercase tracking-[2px]"
                   style={{ color: copied ? COLORS.SUCCESS : COLORS.BITCOIN_ORANGE }}
                 >
-                  {copied ? "Copied" : "Copy"}
+                  {copied ? t("ark.copied") : t("ark.copy")}
                 </Text>
               ) : null}
             </Pressable>
@@ -143,29 +144,29 @@ const getMempoolExplorerBaseUrl = () => {
 
 const buildSections = (arkInfo: BarkArkInfo) => [
   {
-    title: "Keys",
+    title: t("ark.keys"),
     rows: [
-      { label: "Server pubkey", value: arkInfo.server_pubkey, copyable: true },
-      { label: "Mailbox pubkey", value: arkInfo.mailbox_pubkey, copyable: true },
+      { label: t("ark.serverPubkey"), value: arkInfo.server_pubkey, copyable: true },
+      { label: t("ark.mailboxPubkey"), value: arkInfo.mailbox_pubkey, copyable: true },
     ],
   },
   {
-    title: "Boarding limits",
+    title: t("ark.boardingLimits"),
     rows: [
-      { label: "Minimum board amount", value: arkInfo.min_board_amount, unit: "sats" },
-      { label: "Maximum VTXO amount", value: arkInfo.max_vtxo_amount, unit: "sats" },
+      { label: t("ark.minBoarding"), value: arkInfo.min_board_amount, unit: "sats" },
+      { label: t("ark.maxVtxo"), value: arkInfo.max_vtxo_amount, unit: "sats" },
       {
-        label: "Required board confirmations",
+        label: t("ark.confirmationsRequired"),
         value: arkInfo.required_board_confirmations,
         unit: "blocks",
       },
     ],
   },
   {
-    title: "Timing",
+    title: t("ark.timing"),
     rows: [
-      { label: "Round interval", value: arkInfo.round_interval, unit: "seconds" },
-      { label: "Round nonces", value: arkInfo.nb_round_nonces },
+      { label: t("ark.roundInterval"), value: arkInfo.round_interval, unit: "seconds" },
+      { label: t("ark.roundNonces"), value: arkInfo.nb_round_nonces },
       { label: "VTXO exit delta", value: arkInfo.vtxo_exit_delta, unit: "blocks" },
       { label: "VTXO expiry delta", value: arkInfo.vtxo_expiry_delta, unit: "blocks" },
       { label: "HTLC send expiry delta", value: arkInfo.htlc_send_expiry_delta, unit: "blocks" },
@@ -175,7 +176,7 @@ const buildSections = (arkInfo: BarkArkInfo) => [
     title: "Lightning",
     rows: [
       {
-        label: "Receive anti-DoS",
+        label: t("ark.antiDos"),
         value: arkInfo.ln_receive_anti_dos_required,
       },
     ],
@@ -184,20 +185,20 @@ const buildSections = (arkInfo: BarkArkInfo) => [
 
 const buildConfigurationSections = () => [
   {
-    title: "Wallet endpoints",
+    title: t("ark.walletEndpoints"),
     rows: compactRows([
-      { label: "Ark server", value: ACTIVE_WALLET_CONFIG.config?.ark, copyable: true },
+      { label: t("ark.arkServer"), value: ACTIVE_WALLET_CONFIG.config?.ark, copyable: true },
       { label: "Esplora API", value: ACTIVE_WALLET_CONFIG.config?.esplora, copyable: true },
       { label: "Bitcoind RPC", value: ACTIVE_WALLET_CONFIG.config?.bitcoind, copyable: true },
     ]),
   },
   {
-    title: "Explorer APIs",
+    title: t("ark.explorerApis"),
     rows: compactRows([
-      { label: "Block height API", value: getBlockheightEndpoint(), copyable: true },
-      { label: "Mempool explorer", value: getMempoolExplorerBaseUrl(), copyable: true },
-      { label: "Price API", value: mempoolPriceEndpoint, copyable: true },
-      { label: "Historical price API", value: mempoolHistoricalPriceEndpoint, copyable: true },
+      { label: t("ark.blockheightApi"), value: getBlockheightEndpoint(), copyable: true },
+      { label: t("ark.mempoolExplorer"), value: getMempoolExplorerBaseUrl(), copyable: true },
+      { label: t("ark.priceApi"), value: mempoolPriceEndpoint, copyable: true },
+      { label: t("ark.historicalPriceApi"), value: mempoolHistoricalPriceEndpoint, copyable: true },
     ]),
   },
 ];
@@ -223,7 +224,7 @@ const ArkInfoScreen = () => {
             <Pressable onPress={() => navigation.goBack()} className="mr-4">
               <Icon name="arrow-back-outline" size={24} color={iconColor} />
             </Pressable>
-            <Text className="text-2xl font-bold text-foreground">Ark Info</Text>
+            <Text className="text-2xl font-bold text-foreground">{t("ark.title")}</Text>
           </View>
 
           <View className="mt-8 border-b border-border/60 pb-6">
@@ -231,16 +232,16 @@ const ArkInfoScreen = () => {
               Ark Server
             </Text>
             <Text className="mt-3 text-4xl font-bold capitalize text-foreground">
-              {arkInfo?.network ?? "Network"}
+              {arkInfo?.network ?? t("ark.network")}
             </Text>
             <Text className="mt-3 max-w-[320px] text-base leading-6 text-muted-foreground">
-              Current server parameters reported by the loaded Ark wallet.
+              {t("ark.currentParams")}
             </Text>
           </View>
 
           {isLoading ? (
             <View className="mt-8 rounded-[18px] border border-border/60 bg-card/70 px-4 py-5">
-              <Text className="text-muted-foreground">Loading Ark server info...</Text>
+              <Text className="text-muted-foreground">{t("ark.loading")}</Text>
             </View>
           ) : null}
 
@@ -252,15 +253,15 @@ const ArkInfoScreen = () => {
                 backgroundColor: `${colors.card}CC`,
               }}
             >
-              <Text className="text-lg font-semibold text-foreground">Ark info unavailable</Text>
+              <Text className="text-lg font-semibold text-foreground">{t("ark.unavailable")}</Text>
               <Text className="mt-2 text-sm leading-6 text-muted-foreground">
-                {error instanceof Error ? error.message : "Failed to load Ark server info."}
+                {error instanceof Error ? error.message : t("ark.loadFailed")}
               </Text>
               <NativeNoahButton
-                label="Retry"
+                label={t("ark.retry")}
                 onPress={() => refetch()}
                 isLoading={isFetching}
-                loadingLabel="Retrying..."
+                loadingLabel={t("ark.retrying")}
                 className="mt-5 rounded-2xl py-4"
                 fullWidth
               />

@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import { Pressable, ScrollView, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "@react-native-vector-icons/ionicons";
@@ -24,19 +25,19 @@ const ExportDatabaseScreen = () => {
           <Pressable onPress={() => navigation.goBack()} className="mr-4">
             <Icon name="arrow-back-outline" size={24} color={iconColor} />
           </Pressable>
-          <Text className="text-2xl font-bold text-foreground">Export Database</Text>
+          <Text className="text-xl font-bold text-foreground" numberOfLines={1}>{t("exp.title")}</Text>
         </View>
 
         {showExportSuccess && (
           <Alert icon={CheckCircle} className="mb-4">
-            <AlertTitle>Export Complete</AlertTitle>
-            <AlertDescription>Your encrypted database backup was exported.</AlertDescription>
+            <AlertTitle>{t("exp.done")}</AlertTitle>
+            <AlertDescription>{t("exp.success")}</AlertDescription>
           </Alert>
         )}
 
         {showExportError && (
           <Alert icon={AlertCircle} variant="destructive" className="mb-4">
-            <AlertTitle>Export Failed</AlertTitle>
+            <AlertTitle>{t("exp.failed")}</AlertTitle>
             <AlertDescription>{exportError}</AlertDescription>
           </Alert>
         )}
@@ -49,16 +50,15 @@ const ExportDatabaseScreen = () => {
             Export encrypted backup
           </Text>
           <Text className="mt-3 text-center text-base leading-6 text-muted-foreground">
-            This creates an encrypted backup file containing your wallet databases. Keep this file
-            secure, as it can be used to restore your wallet.
+            {t("exp.info")}
           </Text>
         </View>
 
         <NativeNoahButton
-          label="Export Database"
+          label={t("exp.button")}
           onPress={exportDatabase}
           isLoading={isExporting}
-          loadingLabel="Exporting..."
+          loadingLabel={t("exp.exporting")}
           className="mt-8"
           fullWidth
         />

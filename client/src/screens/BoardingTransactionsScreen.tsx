@@ -87,7 +87,7 @@ const BoardingTransactionsScreen = () => {
         url: `file://${filePath}`,
         type: "text/csv",
         filename: filename,
-        subject: "Noah Wallet Boarding Transaction Export",
+        subject: "Thârk Wallet Boarding Transaction Export",
       }),
       (e) => e as Error,
     );

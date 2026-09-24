@@ -1,3 +1,4 @@
+import { t } from "./i18n";
 export const BITCOIN_AMOUNT_UNITS = ["bip177", "sats"] as const;
 
 export type BitcoinAmountUnit = (typeof BITCOIN_AMOUNT_UNITS)[number];
@@ -14,13 +15,13 @@ const BITCOIN_AMOUNT_UNIT_INFO: Record<BitcoinAmountUnit, BitcoinAmountUnitInfo>
     unit: "bip177",
     title: "BIP177",
     value: "₿\u00A01,234",
-    description: "Show bitcoin amounts with the Bitcoin symbol.",
+    description: t("btcunit.bip177Desc"),
   },
   sats: {
     unit: "sats",
     title: "Sats",
     value: "1,234 sats",
-    description: "Show bitcoin amounts in satoshis.",
+    description: t("btcunit.satsDesc"),
   },
 };
 

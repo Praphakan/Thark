@@ -1,3 +1,4 @@
+import "react-native-get-random-values";
 import { registerRootComponent } from "expo";
 import "~/lib/pushNotifications";
 import "react-native-quick-base64";

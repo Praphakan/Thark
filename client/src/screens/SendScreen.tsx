@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import React from "react";
 import { useSendScreen } from "../hooks/useSendScreen";
 import { SendSuccessBottomSheet } from "../components/SendSuccessBottomSheet";
@@ -139,13 +140,12 @@ const SendScreen = () => {
 
   return (
     <NoahSafeAreaView className="flex-1 bg-background">
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <View className="flex-1">
           <View className="flex-row items-center px-5 pt-4 pb-3">
             <Pressable onPress={() => navigation.goBack()} className="mr-4">
               <Icon name="arrow-back-outline" size={24} color={iconColor} />
             </Pressable>
-            <Text className="text-2xl font-bold text-foreground">Send</Text>
+            <Text className="text-2xl font-bold text-foreground">{t("send.title")}</Text>
             <View className="flex-1 items-end">
               <Pressable onPress={handleScanPress}>
                 <Icon name="scan" size={28} color={iconColor} />
@@ -157,17 +157,16 @@ const SendScreen = () => {
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={{
-              paddingBottom: Math.max(bottomTabBarHeight, 20) + 112,
+              paddingBottom: Math.max(bottomTabBarHeight, 20) + 160,
             }}
           >
             <View className="px-5 pb-8">
               <View className="pt-2">
                 <Text className="text-[11px] font-semibold uppercase tracking-[3px] text-muted-foreground">
-                  Send Bitcoin
+                  Envoyer des bitcoins
                 </Text>
                 <Text className="mt-2 max-w-[320px] text-base leading-6 text-muted-foreground">
-                  Paste a destination, choose the payment rail when needed, and confirm before
-                  sending.
+                  {t("send.prompt")}
                 </Text>
               </View>
 
@@ -282,7 +281,7 @@ const SendScreen = () => {
                       <TextInput
                         ref={destinationInputRef}
                         className="min-h-9 flex-1 text-base text-foreground"
-                        placeholder="Address, invoice, or lightning address"
+                        placeholder={t("send.destPlaceholder")}
                         placeholderTextColor={colors.mutedForeground}
                         keyboardType="email-address"
                         autoCorrect={false}
@@ -299,7 +298,7 @@ const SendScreen = () => {
                       className="rounded-full px-3 py-2"
                       style={{ backgroundColor: `${colors.foreground}0D` }}
                     >
-                      <Text className="text-sm font-semibold text-foreground">Paste</Text>
+                      <Text className="text-sm font-semibold text-foreground">{t("send.paste")}</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -348,7 +347,7 @@ const SendScreen = () => {
                   <View className="mt-4 rounded-[20px] border border-border/60 bg-card/70 px-4 py-3">
                     <TextInput
                       className="text-base text-foreground"
-                      placeholder="Add a note (optional)"
+                      placeholder={t("send.notePlaceholder")}
                       placeholderTextColor={colors.mutedForeground}
                       value={comment}
                       onChangeText={setComment}
@@ -366,7 +365,7 @@ const SendScreen = () => {
             <View className="flex-row items-center gap-3">
               {destination ? (
                 <Button onPress={handleClear} variant="outline" className="flex-1 rounded-2xl">
-                  <Text className="font-semibold">Clear</Text>
+                  <Text className="font-semibold">{t("send.clear")}</Text>
                 </Button>
               ) : null}
               <Button
@@ -376,13 +375,12 @@ const SendScreen = () => {
                 style={{ backgroundColor: COLORS.BITCOIN_ORANGE }}
               >
                 <Text className="font-bold" style={{ color: "#1a1a1a" }}>
-                  {isSending ? "Sending..." : "Send"}
+                  {isSending ? t("send.sending") : "Envoyer"}
                 </Text>
               </Button>
             </View>
           </View>
         </View>
-      </TouchableWithoutFeedback>
 
       <AppBottomSheet isOpen={showConfirmation} onClose={handleCancelConfirmation} scrollable>
         <SendConfirmation

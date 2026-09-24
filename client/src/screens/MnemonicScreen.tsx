@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import React, { useEffect, useState } from "react";
 import { View, Pressable } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -38,11 +39,11 @@ const MnemonicScreen = () => {
   useEffect(() => {
     const authenticate = async () => {
       if (!fromOnboarding) {
-        const result = await authenticateIfEnabled("Authenticate to view your seed phrase");
+        const result = await authenticateIfEnabled(t("mn.authToView"));
         if (result.isErr()) {
           showAlert({
-            title: "Authentication Failed",
-            description: "You must authenticate to view your seed phrase.",
+            title: t("mn.authFailed"),
+            description: t("mn.mustAuth"),
           });
           navigation.goBack();
           return;
@@ -64,7 +65,7 @@ const MnemonicScreen = () => {
       } else {
         showAlert({
           title: "Error",
-          description: "Could not retrieve your recovery phrase. Please try again from settings.",
+          description: t("mn.retrieveFailed"),
         });
         navigation.goBack();
       }
@@ -75,7 +76,7 @@ const MnemonicScreen = () => {
   const handleCopy = async () => {
     await copyToClipboard(mnemonic, {
       onCopy: () => {
-        showAlert({ title: "Copied!", description: "Seed phrase copied to clipboard." });
+        showAlert({ title: t("mn.copied"), description: t("mn.phraseCopied") });
       },
     });
   };
@@ -97,18 +98,17 @@ const MnemonicScreen = () => {
               <Icon name="arrow-back-outline" size={24} color={iconColor} />
             </Pressable>
           )}
-          <Text className="text-2xl font-bold text-foreground">Your Recovery Phrase</Text>
+          <Text className="text-2xl font-bold text-foreground" numberOfLines={1} adjustsFontSizeToFit>{t("mn.title")}</Text>
         </View>
 
         <Text className="text-lg text-muted-foreground mb-6">
-          Write down these 12 words in order and store them in a safe place. This is the only way to
-          recover your wallet.
+          {t("mn.instruction")}
         </Text>
 
         {!isAuthenticated ? (
           <View className="flex-1 justify-center items-center">
             <NoahActivityIndicator size="large" />
-            <Text className="text-muted-foreground mt-4">Authenticating...</Text>
+            <Text className="text-muted-foreground mt-4">{t("mn.authenticating")}</Text>
           </View>
         ) : mnemonic ? (
           <Card>
@@ -126,12 +126,12 @@ const MnemonicScreen = () => {
 
         {mnemonic && (
           <View className="mt-6">
-            <NativeNoahSecondaryButton label="Copy Seed Phrase" onPress={handleCopy} fullWidth />
+            <NativeNoahSecondaryButton label={t("mn.copyPhrase")} onPress={handleCopy} fullWidth />
           </View>
         )}
 
         <NativeNoahButton
-          label={fromOnboarding ? "I Have Saved It, Continue" : "Done"}
+          label={fromOnboarding ? "I Have Saved It, Continue" : t("mn.done")}
           onPress={handleContinue}
           disabled={!mnemonic}
           className="mt-4"

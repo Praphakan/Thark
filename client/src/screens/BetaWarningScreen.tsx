@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import React, { useEffect } from "react";
 import { View } from "react-native";
 import { AlertTriangle } from "lucide-react-native";
@@ -33,11 +34,10 @@ const BetaWarningScreen = () => {
             <AlertTriangle size={40} color="#f97316" />
           </View>
           <Text className="mt-6 text-center text-3xl font-bold text-foreground">
-            Noah is in beta
+            {t("beta.title")}
           </Text>
           <Text className="mt-4 text-center text-lg leading-7 text-muted-foreground">
-            Noah is still in beta. There is a possibility you could lose money. Only deposit funds
-            you are willing to lose.
+            {t("beta.warning")}
           </Text>
         </View>
 
@@ -45,19 +45,19 @@ const BetaWarningScreen = () => {
           {isPending ? (
             <View className="items-center">
               <NoahActivityIndicator size="large" />
-              <Text className="mt-4 text-muted-foreground">Creating your wallet...</Text>
+              <Text className="mt-4 text-muted-foreground">{t("beta.creating")}</Text>
             </View>
           ) : (
             <View className="space-y-3">
               <NativeNoahButton
-                label="I accept"
+                label={t("beta.accept")}
                 onPress={() => createWallet()}
                 size="lg"
                 fullWidth
               />
               <View className="mt-3">
                 <NativeNoahSecondaryButton
-                  label="I decline"
+                  label={t("beta.refuse")}
                   onPress={handleDecline}
                   size="lg"
                   fullWidth

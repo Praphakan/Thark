@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import { Linking, Pressable, ScrollView, View, Image } from "react-native";
 import Constants from "expo-constants";
 import { useWalletStore } from "../store/walletStore";
@@ -18,8 +19,8 @@ import { NoahSafeAreaView } from "~/components/NoahSafeAreaView";
 import { ConfirmationDialog, DangerZoneRow } from "../components/ConfirmationDialog";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { AlertTriangle, CheckCircle } from "lucide-react-native";
-import logoImageDark from "../../assets/1024_no_background.png";
-import logoImageLight from "../../assets/All_Files/light_dark_tinted/icon_clear_tinted_ios.png";
+import logoImageDark from "../../assets/thark/logo_qr.png";
+import logoImageLight from "../../assets/thark/logo_light.png";
 import { COLORS } from "~/lib/styleConstants";
 import { useIconColor, useTheme } from "~/hooks/useTheme";
 import { resetAndReRegisterWithServer } from "../lib/server";
@@ -100,10 +101,10 @@ const SettingsScreen = () => {
     useNavigation<NativeStackNavigationProp<SettingsStackParamList & OnboardingStackParamList>>();
 
   const autoBoardDescription = isAutoBoardThresholdError
-    ? "Auto-board threshold unavailable"
+    ? t("set.autoTransferUnavail")
     : isAutoBoardThresholdLoading || autoBoardThreshold === undefined
-      ? "Loading auto-board threshold..."
-      : `Ask to board to Ark when onchain balance can cover ${formatAutoBoardThreshold(autoBoardThreshold)}, estimated fees, and a ${formatAutoBoardThreshold(AUTO_BOARD_ONCHAIN_BUFFER_AMOUNT)} reserve.`;
+      ? t("set.autoTransferLoading")
+      : `Transférer vers Ark quand le solde onchain peut couvrir ${formatAutoBoardThreshold(autoBoardThreshold)}, les frais estimés et une réserve de ${formatAutoBoardThreshold(AUTO_BOARD_ONCHAIN_BUFFER_AMOUNT)}.`;
 
   useEffect(() => {
     const check = async () => {
@@ -141,8 +142,8 @@ const SettingsScreen = () => {
 
   const handleBiometricsToggle = async (value: boolean) => {
     const promptMessage = value
-      ? "Authenticate to enable biometrics"
-      : "Authenticate to disable biometrics";
+      ? t("set.authEnableBio")
+      : t("set.authDisableBio");
     const result = await authenticate(promptMessage);
     if (result.isOk()) {
       setBiometricsEnabled(value);
@@ -222,29 +223,29 @@ const SettingsScreen = () => {
   if (isInitialized) {
     profileData.push({
       id: "profile",
-      title: "Profile",
-      description: "Manage your name, Lightning address, emergency email, and public key.",
+      title: t("set.profile"),
+      description: t("set.profileDesc"),
       isPressable: true,
     });
     profileData.push({
       id: "currency",
-      title: "Currency",
+      title: t("set.currency"),
       value: `${preferredCurrencyInfo.code} · ${preferredCurrencyInfo.name}`,
-      description: "Choose the fiat currency used for balances and payment amounts.",
+      description: t("set.currencyDesc"),
       isPressable: true,
     });
     profileData.push({
       id: "bitcoinUnit",
-      title: "Bitcoin Unit",
+      title: t("set.bitcoinUnit"),
       value: `${bitcoinAmountUnitInfo.title} · ${bitcoinAmountUnitInfo.value}`,
-      description: "Choose how bitcoin amounts are displayed.",
+      description: t("set.bitcoinUnitDesc"),
       isPressable: true,
     });
 
     infoData.push({
       id: "arkInfo",
-      title: "Ark Info",
-      description: "View Ark server, wallet, and explorer configuration.",
+      title: t("set.arkInfo"),
+      description: t("set.arkInfoDesc"),
       isPressable: true,
     });
   }
@@ -252,65 +253,33 @@ const SettingsScreen = () => {
   if (isInitialized) {
     walletData.push({
       id: "showMnemonic",
-      title: "Show Seed Phrase",
+      title: t("set.showMnemonic"),
       description:
-        "Never share your seed phrase with anyone. It is important to keep it safe and secure.",
+        t("set.mnemonicWarn"),
       isPressable: true,
     });
     walletData.push({
       id: "vtxos",
-      title: "Show VTXOs",
-      description: "VTXOs are to Ark like UTXOs are to Bitcoin",
+      title: t("set.showVtxos"),
+      description: t("set.vtxosDesc"),
       isPressable: true,
     });
     walletData.push({
       id: "emergencyExit",
-      title: "Emergency Exit",
-      description: "Recover funds if the Ark server is unavailable.",
+      title: t("set.emergencyExit"),
+      description: t("set.emergencyExitDesc"),
       isPressable: true,
     });
     walletData.push({
       id: "backup",
-      title: "Backup & Restore",
-      description: "Automatically or manually backup your wallet after encrypting it.",
+      title: t("set.backup"),
+      description: t("set.backupDesc"),
       isPressable: true,
     });
 
-    if (shouldUseUnifiedPush()) {
-      walletData.push({
-        id: "unifiedPush",
-        title: "UnifiedPush Setup",
-        description: "Configure push notifications using UnifiedPush",
-        isPressable: true,
-      });
-    }
+    /* UnifiedPush retiré (Thârk) */
 
-    debugData.push({
-      id: "showLogs",
-      title: "Show Logs",
-      description: "View application logs for debugging purposes",
-      isPressable: true,
-    });
-    debugData.push({
-      id: "resetRegistration",
-      title: "Reset Server Registration",
-      description: "Clear your registration with the server. You will need to register again.",
-      isPressable: true,
-    });
-    debugData.push({
-      id: "feedback",
-      title: "Send Feedback",
-      description: "Report bugs or share feedback with the Noah team",
-      isPressable: true,
-    });
-    if (isDebugModeEnabled) {
-      debugData.push({
-        id: "debug",
-        title: "Debug Screen",
-        description: "Advanced debug actions for developers",
-        isPressable: true,
-      });
-    }
+    /* debugData vidé (Thârk : strict minimum) */
   }
 
   const renderSettingItem = (item: Setting) => {
@@ -321,13 +290,13 @@ const SettingsScreen = () => {
           trigger={
             <DangerZoneRow
               title={item.title}
-              description="Attempt to reset the connection with our server if you're experiencing issues."
+              description={t("set.resetAttemptDesc")}
               isPressable={item.isPressable}
               onPress={() => {}}
             />
           }
           title="Reset Server Registration"
-          description="Are you sure you want to reset your server registration? This will not delete your wallet, but you will need to register with the server again."
+          description={t("set.resetConfirm")}
           onConfirm={async () => {
             setResetError(null);
             setShowResetSuccess(false);
@@ -373,34 +342,34 @@ const SettingsScreen = () => {
           <Pressable onPress={() => navigation.goBack()} className="mr-4">
             <Icon name="arrow-back-outline" size={24} color={iconColor} />
           </Pressable>
-          <Text className="text-2xl font-bold text-foreground">Settings</Text>
+          <Text className="text-2xl font-bold text-foreground">{t("set.title")}</Text>
         </View>
 
         {showResetSuccess && (
           <Alert icon={CheckCircle} className="mb-4">
-            <AlertTitle>Success!</AlertTitle>
-            <AlertDescription>Server registration has been reset.</AlertDescription>
+            <AlertTitle>{t("set.success")}</AlertTitle>
+            <AlertDescription>{t("set.resetDone")}</AlertDescription>
           </Alert>
         )}
         {resetError && (
           <Alert icon={AlertTriangle} variant="destructive" className="mb-4">
-            <AlertTitle>Reset Failed!</AlertTitle>
+            <AlertTitle>{t("set.resetFailed")}</AlertTitle>
             <AlertDescription>{resetError}</AlertDescription>
           </Alert>
         )}
         {showMailboxSuccess && (
           <Alert icon={CheckCircle} className="mb-4">
-            <AlertTitle>Mailbox Access Updated!</AlertTitle>
+            <AlertTitle>{t("set.mailboxUpdated")}</AlertTitle>
             <AlertDescription>
               {isMailboxAuthorizationEnabled
-                ? "Mailbox authorization will be granted again shortly."
-                : "Mailbox authorization has been revoked."}
+                ? t("set.mailboxGranted")
+                : t("set.mailboxRevoked")}
             </AlertDescription>
           </Alert>
         )}
         {mailboxError && (
           <Alert icon={AlertTriangle} variant="destructive" className="mb-4">
-            <AlertTitle>Mailbox Update Failed!</AlertTitle>
+            <AlertTitle>{t("set.mailboxFailed")}</AlertTitle>
             <AlertDescription>{mailboxError}</AlertDescription>
           </Alert>
         )}
@@ -413,13 +382,11 @@ const SettingsScreen = () => {
         }}
       >
         <View className="items-center mb-6">
-          <Pressable onPress={() => navigation.navigate("NoahStory")}>
-            <Image
-              source={logoImage}
-              style={{ width: 120, height: 120, borderRadius: 12 }}
-              resizeMode="contain"
-            />
-          </Pressable>
+          <Image
+            source={logoImage}
+            style={{ width: 120, height: 120, borderRadius: 12 }}
+            resizeMode="contain"
+          />
         </View>
 
         {profileData.length > 0 && (
@@ -428,7 +395,7 @@ const SettingsScreen = () => {
               className="text-lg font-bold text-foreground mb-2"
               style={{ color: COLORS.BITCOIN_ORANGE }}
             >
-              Account
+              {t("set.sectionAccount")}
             </Text>
             {profileData.map(renderSettingItem)}
           </View>
@@ -440,7 +407,7 @@ const SettingsScreen = () => {
               className="text-lg font-bold text-foreground mb-2"
               style={{ color: COLORS.BITCOIN_ORANGE }}
             >
-              Info
+              {t("set.sectionInfo")}
             </Text>
             {infoData.map(renderSettingItem)}
           </View>
@@ -452,12 +419,12 @@ const SettingsScreen = () => {
               className="text-lg font-bold text-foreground mb-2"
               style={{ color: COLORS.BITCOIN_ORANGE }}
             >
-              Wallet
+              {t("set.sectionWallet")}
             </Text>
             {walletData.map(renderSettingItem)}
             <View className="p-4 border-b border-border bg-card rounded-lg mb-2 flex-row justify-between items-center">
               <View className="flex-1">
-                <Label className="text-foreground text-lg">Auto-Board to Ark</Label>
+                <Label className="text-foreground text-lg">{t("set.autoTransfer")}</Label>
                 <Text className="text-base mt-1 text-muted-foreground">{autoBoardDescription}</Text>
               </View>
               <NativeSwitch value={isAutoBoardingEnabled} onValueChange={setAutoBoardingEnabled} />
@@ -465,9 +432,9 @@ const SettingsScreen = () => {
             {isBiometricsAvailable && (
               <View className="p-4 border-b border-border bg-card rounded-lg mb-2 flex-row justify-between items-center">
                 <View className="flex-1">
-                  <Label className="text-foreground text-lg">Biometric Authentication</Label>
+                  <Label className="text-foreground text-lg">{t("set.biometricAuth")}</Label>
                   <Text className="text-base mt-1 text-muted-foreground">
-                    Require biometric authentication to unlock your wallet
+                    {t("set.biometricDesc")}
                   </Text>
                 </View>
                 <NativeSwitch value={isBiometricsEnabled} onValueChange={handleBiometricsToggle} />
@@ -475,9 +442,9 @@ const SettingsScreen = () => {
             )}
             <View className="p-4 border-b border-border bg-card rounded-lg mb-2 flex-row justify-between items-center">
               <View className="flex-1">
-                <Label className="text-foreground text-lg">Mailbox Notifications</Label>
+                <Label className="text-foreground text-lg">{t("set.mailboxNotif")}</Label>
                 <Text className="text-base mt-1 text-muted-foreground">
-                  Allow Noah to monitor your Ark mailbox so it can wake this app to claim Lightning
+                  {t("set.mailboxDesc")}
                   payments in the background.
                 </Text>
               </View>
@@ -496,7 +463,7 @@ const SettingsScreen = () => {
               className="text-lg font-bold text-foreground mb-2"
               style={{ color: COLORS.BITCOIN_ORANGE }}
             >
-              Debug
+              {t("set.sectionDebug")}
             </Text>
             {debugData.map(renderSettingItem)}
           </View>
@@ -504,14 +471,13 @@ const SettingsScreen = () => {
 
         {isInitialized && (
           <View className="mb-6">
-            <Text className="text-lg font-bold text-destructive mb-2">Danger Zone</Text>
+            <Text className="text-lg font-bold text-destructive mb-2">{t("set.sensitiveZone")}</Text>
 
             <View className="p-4 border-b border-border bg-card rounded-lg mb-4 flex-row justify-between items-center">
               <View className="flex-1">
-                <Label className="text-foreground text-lg">Suspend Wallet</Label>
+                <Label className="text-foreground text-lg">{t("set.suspendWallet")}</Label>
                 <Text className="text-base mt-1 text-muted-foreground">
-                  Disable all wallet operations. The wallet will be closed and won't load until
-                  re-enabled.
+                  {t("set.suspendDesc")}
                 </Text>
               </View>
               <NativeSwitch
@@ -523,14 +489,14 @@ const SettingsScreen = () => {
             </View>
 
             <DangerZoneRow
-              title="Export Database"
-              description="Create an encrypted backup file containing your wallet database."
+              title={t("set.exportDb")}
+              description={t("set.exportDbDesc")}
               isPressable
               onPress={() => navigation.navigate("ExportDatabase")}
             />
 
             <NativeNoahButton
-              label="Delete Wallet"
+              label={t("set.deleteWallet")}
               variant="destructive"
               onPress={() => setIsDeleteWalletDialogOpen(true)}
               fullWidth
@@ -543,7 +509,7 @@ const SettingsScreen = () => {
                   setConfirmText("");
                 }
               }}
-              title="Delete Wallet"
+              title={t("set.deleteWallet")}
               description={`This action is irreversible. To confirm, please type "delete" in the box below.`}
               onConfirm={() => {
                 if (confirmText.toLowerCase() === "delete") {
@@ -584,7 +550,7 @@ const SettingsScreen = () => {
               </Text>
             </Text>
           </Pressable>
-          <Text className="text-muted-foreground text-sm">Made with ❤️ from Noah team</Text>
+          <Text className="text-muted-foreground text-sm">{t("set.madeWith")}</Text>
         </View>
       </ScrollView>
     </NoahSafeAreaView>

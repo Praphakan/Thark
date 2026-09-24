@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { View, Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -52,7 +53,7 @@ const LogScreen = () => {
           }
         }, 100);
       } else {
-        setError(result.error.message || "Failed to fetch logs.");
+        setError(result.error.message || t("log.fetchFailed"));
       }
       setIsLoading(false);
     }
@@ -79,8 +80,8 @@ const LogScreen = () => {
     }
 
     const options = {
-      title: "Share your file",
-      message: "Noah App Logs",
+      title: t("log.shareFile"),
+      message: "Thârk App Logs",
       url,
       type: "text/plain",
     };
@@ -123,7 +124,7 @@ const LogScreen = () => {
             <Pressable onPress={() => navigation.goBack()} className="mr-4">
               <Icon name="arrow-back-outline" size={24} color={iconColor} />
             </Pressable>
-            <Text className="text-2xl font-bold text-foreground">App Logs</Text>
+            <Text className="text-2xl font-bold text-foreground">{t("log.title")}</Text>
           </View>
           <View className="flex-row space-x-2">
             <NativeNoahIconButton
@@ -167,7 +168,7 @@ const LogScreen = () => {
               </>
             ) : (
               <View className="flex-1 justify-center items-center">
-                <Text className="text-center text-muted-foreground">No logs found.</Text>
+                <Text className="text-center text-muted-foreground">{t("log.noLogs")}</Text>
               </View>
             )}
           </View>

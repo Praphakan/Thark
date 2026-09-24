@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import React from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -41,7 +42,7 @@ const BitcoinUnitSettingsScreen = () => {
             <Pressable onPress={() => navigation.goBack()} className="mr-4">
               <Icon name="arrow-back-outline" size={24} color={iconColor} />
             </Pressable>
-            <Text className="text-2xl font-bold text-foreground">Bitcoin Unit</Text>
+            <Text className="text-2xl font-bold text-foreground">{t("btcunit.title")}</Text>
           </View>
 
           <View

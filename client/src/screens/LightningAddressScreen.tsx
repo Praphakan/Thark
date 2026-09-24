@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import React, { useState } from "react";
 import { View, Pressable } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -77,23 +78,23 @@ const LightningAddressScreen = () => {
             </Pressable>
           )}
           <Text className="text-2xl font-bold text-foreground">
-            {fromOnboarding ? "Choose your Lightning Address" : "Lightning Address"}
+            {fromOnboarding ? t("ln.choose") : t("ln.title")}
           </Text>
         </View>
         {showUpdateSuccess && (
           <Alert icon={CheckCircle} className="mb-4">
-            <AlertTitle>Success!</AlertTitle>
-            <AlertDescription>Lightning address has been updated.</AlertDescription>
+            <AlertTitle>{t("ln.success")}</AlertTitle>
+            <AlertDescription>{t("ln.updated")}</AlertDescription>
           </Alert>
         )}
         <View className="mt-10">
           <Text className="text-muted-foreground mb-3">
-            Pick a username or let us assign one for you.
+            Choisissez un nom d'utilisateur ou laissez-nous en attribuer un.
           </Text>
           <View className="bg-card rounded-2xl border border-border p-5 space-y-5">
             <View>
               <Text className="text-xs uppercase tracking-widest text-muted-foreground mb-2">
-                Username
+                Nom d'utilisateur
               </Text>
               <Input
                 value={username}
@@ -106,7 +107,7 @@ const LightningAddressScreen = () => {
               />
             </View>
             <View className="bg-background/70 rounded-xl p-3 border border-border/60">
-              <Text className="text-xs text-muted-foreground">Your lightning address will be</Text>
+              <Text className="text-xs text-muted-foreground">{t("ln.willBe")}</Text>
               <Text className="text-md font-semibold text-foreground mt-1">
                 {normalizedUsername}@{domain}
               </Text>
@@ -117,7 +118,7 @@ const LightningAddressScreen = () => {
           <View className="flex-row items-center mt-8 gap-4">
             <View className="flex-1">
               <NativeNoahSecondaryButton
-                label="Skip"
+                label={t("ln.skip")}
                 onPress={handleSkip}
                 disabled={updateLightningAddressMutation.isPending}
                 fullWidth
@@ -125,10 +126,10 @@ const LightningAddressScreen = () => {
             </View>
             <View className="flex-1">
               <NativeNoahButton
-                label={`${normalizedUsername}@${domain}` === lightningAddress ? "Continue" : "Save"}
+                label={`${normalizedUsername}@${domain}` === lightningAddress ? t("ln.continue") : t("ln.save")}
                 onPress={handleSave}
                 isLoading={updateLightningAddressMutation.isPending}
-                loadingLabel="Saving..."
+                loadingLabel={t("ln.saving")}
                 disabled={!normalizedUsername}
                 fullWidth
               />
@@ -136,11 +137,11 @@ const LightningAddressScreen = () => {
           </View>
         ) : (
           <NativeNoahButton
-            label="Save"
+            label={t("ln.save")}
             onPress={handleSave}
             className="mt-8"
             isLoading={updateLightningAddressMutation.isPending}
-            loadingLabel="Saving..."
+            loadingLabel={t("ln.saving")}
             disabled={!normalizedUsername}
             fullWidth
           />

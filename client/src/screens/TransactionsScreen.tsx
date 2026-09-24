@@ -109,7 +109,7 @@ const TransactionsScreen = () => {
         url: `file://${filePath}`,
         type: "text/csv",
         filename: filename,
-        subject: "Noah Wallet Transaction Export",
+        subject: "Thârk Wallet Transaction Export",
       }),
       (e) => e as Error,
     );

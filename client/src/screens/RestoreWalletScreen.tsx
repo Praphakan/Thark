@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import React, { useState } from "react";
 import {
   View,
@@ -45,7 +46,7 @@ const RestoreWalletScreen = ({ navigation }: Props) => {
               <Pressable onPress={() => navigation.goBack()} className="mr-4">
                 <Icon name="arrow-back-outline" size={24} color={iconColor} />
               </Pressable>
-              <Text className="text-2xl font-bold text-foreground">Restore Wallet</Text>
+              <Text className="text-2xl font-bold text-foreground">{t("rest.title")}</Text>
             </View>
             <View className="pt-8 items-center w-full">
               <Text className="text-lg text-muted-foreground mb-10 text-center">
@@ -53,7 +54,7 @@ const RestoreWalletScreen = ({ navigation }: Props) => {
               </Text>
               <TextInput
                 className="w-full h-24 bg-input rounded-lg p-4 text-foreground text-lg text-left"
-                placeholder="Enter your seed phrase"
+                placeholder={t("rest.placeholder")}
                 placeholderTextColor="#666"
                 value={mnemonic}
                 onChangeText={setMnemonic}
@@ -84,11 +85,11 @@ const RestoreWalletScreen = ({ navigation }: Props) => {
               )}
 
               <NativeNoahButton
-                label="Restore"
+                label={t("rest.button")}
                 onPress={handleRestore}
                 disabled={isPending}
                 isLoading={isPending}
-                loadingLabel="Restoring..."
+                loadingLabel={t("rest.restoring")}
                 width={168}
               />
             </View>

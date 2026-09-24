@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   View,
@@ -182,7 +183,7 @@ const PaymentRail = ({
               : COLORS.TAB_BAR_INACTIVE,
         }}
       >
-        {isCopied ? "Copied" : (actionLabel ?? (isCopyable ? "Copy" : ""))}
+        {isCopied ? t("recv.copied") : (actionLabel ?? (isCopyable ? t("recv.copy") : ""))}
       </Text>
     </Pressable>
   );
@@ -672,14 +673,14 @@ const ReceiveScreen = () => {
           className="flex-1"
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{ paddingBottom: 32 }}
+          contentContainerStyle={{ paddingBottom: 120 }}
         >
           <View className="px-5 pb-8">
             <View className="mb-4 flex-row items-center pt-1">
               <Pressable onPress={() => navigation.goBack()} className="mr-4">
                 <Icon name="arrow-back-outline" size={24} color={iconColor} />
               </Pressable>
-              <Text className="text-2xl font-bold text-foreground">Receive</Text>
+              <Text className="text-2xl font-bold text-foreground">{t("recv.title")}</Text>
             </View>
 
             <View className="pt-1">
@@ -687,7 +688,7 @@ const ReceiveScreen = () => {
                 Receive Bitcoin
               </Text>
               <Text className="mt-2 max-w-[320px] text-base leading-6 text-muted-foreground">
-                Generate a payment request with Ark, Lightning, and on-chain rails when available.
+                {t("recv.generatePrompt")}
               </Text>
             </View>
 
@@ -771,7 +772,7 @@ const ReceiveScreen = () => {
                       borderColor: `${colors.mutedForeground}1F`,
                     }}
                   >
-                    <Text className="text-sm text-muted-foreground">Payment request is live</Text>
+                    <Text className="text-sm text-muted-foreground">{t("recv.activeRequest")}</Text>
                   </View>
                 ) : null}
               </View>
@@ -788,7 +789,7 @@ const ReceiveScreen = () => {
                     className="mt-5"
                   >
                     <Text className="text-sm font-semibold text-primary">
-                      {isCopied("bip321") ? "Request copied" : "Tap to copy request"}
+                      {isCopied("bip321") ? t("recv.requestCopied") : t("recv.tapToCopy")}
                     </Text>
                   </Pressable>
                   <Text className="mt-3 max-w-[270px] text-center text-sm leading-6 text-muted-foreground">
@@ -850,9 +851,9 @@ const ReceiveScreen = () => {
                     <PaymentRail
                       icon="flash-outline"
                       label="Lightning"
-                      value="Amount required for Lightning"
+                      value={t("recv.amountRequiredLn")}
                       isCopied={false}
-                      actionLabel="Required"
+                      actionLabel={t("recv.required")}
                     />
                     <View className="h-px bg-border" />
                   </>
@@ -876,7 +877,7 @@ const ReceiveScreen = () => {
                   className="mb-3 text-center text-sm font-semibold leading-5"
                   style={{ color: COLORS.BITCOIN_ORANGE }}
                 >
-                  Enter an amount for Lightning
+                  {t("recv.enterAmountLn")}
                 </Text>
               ) : null}
               <View className="flex-row items-center gap-3">
@@ -886,7 +887,7 @@ const ReceiveScreen = () => {
                   variant="outline"
                   className="h-14 w-[120px] rounded-2xl"
                 >
-                  <Text className="font-semibold">Clear</Text>
+                  <Text className="font-semibold">{t("recv.clear")}</Text>
                 </Button>
                 <Button
                   onPress={handleGenerate}
@@ -894,8 +895,8 @@ const ReceiveScreen = () => {
                   className="h-14 flex-1 rounded-2xl"
                   style={{ backgroundColor: COLORS.BITCOIN_ORANGE }}
                 >
-                  <Text className="font-bold" style={{ color: "#1a1a1a" }}>
-                    {isLoading ? "Generating..." : isGenerated ? "New request" : "Generate request"}
+                  <Text numberOfLines={1} className="font-bold" style={{ color: "#1a1a1a" }}>
+                    {isLoading ? t("recv.generating") : isGenerated ? t("recv.regenerate") : t("recv.generate")}
                   </Text>
                 </Button>
               </View>

@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import React, { useEffect, useRef, useState } from "react";
 import { Pressable, ScrollView, TextInput, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -49,14 +50,14 @@ const CopyRow = ({ label, value }: { label: string; value: string }) => {
           numberOfLines={1}
           ellipsizeMode="middle"
         >
-          {copied ? "Copied" : truncateValue(value)}
+          {copied ? t("prof.copied") : truncateValue(value)}
         </Text>
       </View>
       <Text
         className="text-xs font-semibold uppercase tracking-[2px]"
         style={{ color: copied ? COLORS.SUCCESS : COLORS.BITCOIN_ORANGE }}
       >
-        {copied ? "Copied" : "Copy"}
+        {copied ? t("prof.copied") : t("prof.copy")}
       </Text>
     </Pressable>
   );
@@ -143,7 +144,7 @@ const ProfileScreen = () => {
   };
 
   const isNameInputEditable = isEditingName && saveStatus !== "saving";
-  const nameActionLabel = isEditingName ? "Save" : "Edit";
+  const nameActionLabel = isEditingName ? t("prof.save") : t("prof.edit");
   const nameActionColor =
     saveStatus === "error"
       ? "#ef4444"
@@ -163,12 +164,12 @@ const ProfileScreen = () => {
             <Pressable onPress={() => navigation.goBack()} className="mr-4">
               <Icon name="arrow-back-outline" size={24} color={iconColor} />
             </Pressable>
-            <Text className="text-2xl font-bold text-foreground">Profile</Text>
+            <Text className="text-2xl font-bold text-foreground">{t("prof.title")}</Text>
           </View>
 
           <View className="mt-8">
             <Label className="text-sm font-semibold uppercase tracking-[2px] text-muted-foreground">
-              Name
+              {t("prof.name")}
             </Label>
             <View className="mt-3">
               <Input
@@ -178,7 +179,7 @@ const ProfileScreen = () => {
                   setDraftDisplayName(value);
                   setSaveStatus("idle");
                 }}
-                placeholder="Add a display name"
+                placeholder={t("prof.addName")}
                 editable={isNameInputEditable}
                 className="h-14 rounded-2xl py-0 pl-4 pr-24"
                 style={{
@@ -207,7 +208,7 @@ const ProfileScreen = () => {
               <Pressable
                 onPress={handleNameAction}
                 disabled={saveStatus === "saving"}
-                accessibilityLabel={isEditingName ? "Save name" : "Edit name"}
+                accessibilityLabel={isEditingName ? t("prof.saveName") : t("prof.editName")}
                 className="absolute right-2 top-2 h-10 min-w-16 items-center justify-center rounded-full px-3"
                 style={{ backgroundColor: `${nameActionColor}18` }}
               >
@@ -220,7 +221,7 @@ const ProfileScreen = () => {
 
           <View className="mt-8">
             <Text className="text-sm font-semibold uppercase tracking-[2px] text-muted-foreground">
-              Lightning Address
+              {t("prof.lightningAddress")}
             </Text>
             <View
               className="mt-3 overflow-hidden rounded-[18px] border"
@@ -234,7 +235,7 @@ const ProfileScreen = () => {
               ) : (
                 <View className="px-4 py-4">
                   <Text className="text-base font-semibold text-foreground">
-                    No Lightning address set
+                    Aucune adresse Lightning définie
                   </Text>
                   <Text className="mt-1 text-sm text-muted-foreground">
                     Create one to receive payments with your QR code.
@@ -247,7 +248,7 @@ const ProfileScreen = () => {
                 className="flex-row items-center justify-between px-4 py-4"
               >
                 <Text className="text-base font-semibold text-foreground">
-                  Change Lightning Address
+                  Changer l'adresse Lightning
                 </Text>
                 <Icon name="chevron-forward-outline" size={22} color={iconColor} />
               </Pressable>
@@ -256,7 +257,7 @@ const ProfileScreen = () => {
 
           <View className="mt-8">
             <Text className="text-sm font-semibold uppercase tracking-[2px] text-muted-foreground">
-              Emergency Email
+              {t("prof.emergencyEmail")}
             </Text>
             <View
               className="mt-3 overflow-hidden rounded-[18px] border"
@@ -270,12 +271,12 @@ const ProfileScreen = () => {
               ) : (
                 <View className="px-4 py-4">
                   <Text className="text-base font-semibold text-foreground">
-                    {isEmailVerified ? "Email alerts enabled" : "No emergency email set"}
+                    {isEmailVerified ? t("prof.emergencyAlertsOn") : t("prof.noEmergencyEmail")}
                   </Text>
                   <Text className="mt-1 text-sm text-muted-foreground">
                     {isEmailVerified
-                      ? "Your address will appear after the next server sync."
-                      : "Optional alerts for urgent wallet communication."}
+                      ? t("prof.addressAfterSync")
+                      : t("prof.emergencyAlertsDesc")}
                   </Text>
                 </View>
               )}
@@ -285,7 +286,7 @@ const ProfileScreen = () => {
                 className="flex-row items-center justify-between px-4 py-4"
               >
                 <Text className="text-base font-semibold text-foreground">
-                  {isEmailVerified ? "Change Emergency Email" : "Add Emergency Email"}
+                  {isEmailVerified ? t("prof.editEmergencyEmail") : t("prof.addEmergencyEmail")}
                 </Text>
                 <Icon name="chevron-forward-outline" size={22} color={iconColor} />
               </Pressable>
@@ -295,7 +296,7 @@ const ProfileScreen = () => {
           {derivedKeyPair?.public_key ? (
             <View className="mt-8">
               <Text className="text-sm font-semibold uppercase tracking-[2px] text-muted-foreground">
-                Public Key
+                {t("prof.publicKey")}
               </Text>
               <View
                 className="mt-3 overflow-hidden rounded-[18px] border"
@@ -304,7 +305,7 @@ const ProfileScreen = () => {
                   backgroundColor: `${colors.card}CC`,
                 }}
               >
-                <CopyRow label="Wallet public key" value={derivedKeyPair.public_key} />
+                <CopyRow label={t("prof.walletPubkey")} value={derivedKeyPair.public_key} />
               </View>
             </View>
           ) : null}

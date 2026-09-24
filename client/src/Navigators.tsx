@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import React, { useCallback, useEffect, useState, useRef } from "react";
 import {
   NavigationContainer,
@@ -28,6 +29,7 @@ import BoardingTransactionsScreen from "~/screens/BoardingTransactionsScreen";
 import LightningAddressScreen from "~/screens/LightningAddressScreen";
 import EmailVerificationScreen from "~/screens/EmailVerificationScreen";
 import { BackupSettingsScreen } from "~/screens/BackupSettingsScreen";
+import PayThaiQRScreen from "~/screens/PayThaiQRScreen";
 import RestoreWalletScreen from "~/screens/RestoreWalletScreen";
 import ArkInfoScreen from "~/screens/ArkInfoScreen";
 import ExportDatabaseScreen from "~/screens/ExportDatabaseScreen";
@@ -64,8 +66,7 @@ import logger from "~/lib/log";
 // Param list types
 export type TabParamList = {
   Home: NavigatorScreenParams<HomeStackParamList> | undefined;
-  Receive: undefined;
-  Send: { destination?: string };
+  Scan: undefined;
   History: NavigatorScreenParams<TransactionsStackParamList> | undefined;
 };
 
@@ -103,9 +104,11 @@ export type OnboardingStackParamList = {
 };
 
 export type HomeStackParamList = {
+  Receive: undefined;
+  PayThaiQR: { qrData: string };
   HomeStack: undefined;
   BoardArk: undefined;
-  QRHub: undefined;
+  QRHub: { startScan?: boolean } | undefined;
   Settings: NavigatorScreenParams<SettingsStackParamList> | undefined;
   Send: { destination: string };
   BoardingTransactions: undefined;
@@ -214,6 +217,16 @@ const HomeStackScreen = () => (
       options={{ headerShown: false, animation: "default" }}
     />
     <HomeStack.Screen
+      name="PayThaiQR"
+      component={PayThaiQRScreen}
+      options={{ headerShown: false, animation: "default" }}
+    />
+    <HomeStack.Screen
+      name="Receive"
+      component={ReceiveScreen}
+      options={{ headerShown: false, animation: "default" }}
+    />
+    <HomeStack.Screen
       name="Send"
       component={SendScreen}
       options={{ headerShown: false, animation: "default" }}
@@ -300,6 +313,8 @@ type PreloadedIcons = {
   arrowUpOutline: ImageSourcePropType;
   history: ImageSourcePropType;
   historyOutline: ImageSourcePropType;
+  scan: ImageSourcePropType;
+  scanOutline: ImageSourcePropType;
 };
 
 const preloadAndroidIcons = async (): Promise<PreloadedIcons> => {
@@ -312,6 +327,8 @@ const preloadAndroidIcons = async (): Promise<PreloadedIcons> => {
     arrowUpOutline,
     history,
     historyOutline,
+    scan,
+    scanOutline,
   ] = await Promise.all([
     Icon.getImageSource("home", 24),
     Icon.getImageSource("home-outline", 24),
@@ -321,6 +338,8 @@ const preloadAndroidIcons = async (): Promise<PreloadedIcons> => {
     Icon.getImageSource("arrow-up-outline", 24),
     Icon.getImageSource("time", 24),
     Icon.getImageSource("time-outline", 24),
+    Icon.getImageSource("scan", 24),
+    Icon.getImageSource("scan-outline", 24),
   ]);
   return {
     home: home!,
@@ -331,6 +350,8 @@ const preloadAndroidIcons = async (): Promise<PreloadedIcons> => {
     arrowUpOutline: arrowUpOutline!,
     history: history!,
     historyOutline: historyOutline!,
+    scan: scan!,
+    scanOutline: scanOutline!,
   };
 };
 
@@ -354,6 +375,7 @@ const AppTabs = ({ preloadedIcons }: { preloadedIcons: PreloadedIcons }) => {
         name="Home"
         component={HomeStackScreen}
         options={{
+          tabBarLabel: t("tab.home"),
           tabBarIcon: ({ focused }) => {
             if (isIos) {
               return { sfSymbol: "house.fill" };
@@ -386,36 +408,26 @@ const AppTabs = ({ preloadedIcons }: { preloadedIcons: PreloadedIcons }) => {
         })}
       />
       <Tab.Screen
-        name="Receive"
-        component={ReceiveScreen}
+        name="Scan"
+        component={QRHubScreen}
         options={{
           lazy: true,
+          tabBarLabel: t("tab.scan"),
           tabBarIcon: ({ focused }) => {
             if (isIos) {
-              return { sfSymbol: "arrow.down.left" };
+              return { sfSymbol: "qrcode.viewfinder" };
             }
-            return focused ? preloadedIcons!.arrowDown : preloadedIcons!.arrowDownOutline;
+            return focused ? preloadedIcons!.scan : preloadedIcons!.scanOutline;
           },
         }}
       />
-      <Tab.Screen
-        name="Send"
-        component={SendScreen}
-        options={{
-          lazy: true,
-          tabBarIcon: ({ focused }) => {
-            if (isIos) {
-              return { sfSymbol: "arrow.up.right" };
-            }
-            return focused ? preloadedIcons!.arrowUp : preloadedIcons!.arrowUpOutline;
-          },
-        }}
-      />
+      {/* Onglet Send retiré (Thârk) — accessible via les cartes d'accueil */}
       <Tab.Screen
         name="History"
         component={TransactionsStackScreen}
         options={{
           lazy: true,
+          tabBarLabel: t("tab.history"),
           tabBarIcon: ({ focused }) => {
             if (isIos) {
               return { sfSymbol: "clock.arrow.circlepath" };

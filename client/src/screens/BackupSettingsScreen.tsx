@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import React, { useState } from "react";
 import { View, ScrollView, Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -41,15 +42,14 @@ export const BackupSettingsScreen = () => {
           <Pressable onPress={() => navigation.goBack()} className="mr-4">
             <Icon name="arrow-back-outline" size={24} color={iconColor} />
           </Pressable>
-          <Text className="text-2xl font-bold text-foreground">Backup</Text>
+          <Text className="text-2xl font-bold text-foreground">{t("bak.title")}</Text>
         </View>
         <Text className="text-muted-foreground mb-8">
-          Backups are encrypted with your seed phrase and stored securely on our servers. We can
-          never access your funds or data.
+          {t("bak.encryptedInfo")}
         </Text>
 
         <View className="flex-row justify-between items-center p-4 border-b border-border bg-card rounded-lg mb-4">
-          <Label className="text-foreground text-lg">Enable Automatic Backups</Label>
+          <Label className="text-foreground text-lg flex-1 mr-3">{t("bak.autoBackups")}</Label>
           <NativeSwitch
             value={isBackupEnabled}
             onValueChange={setBackupEnabled}
@@ -59,20 +59,20 @@ export const BackupSettingsScreen = () => {
 
         {showSuccessAlert && (
           <Alert icon={CheckCircle} className="mb-4">
-            <AlertTitle>Backup Complete!</AlertTitle>
-            <AlertDescription>Your wallet has been backed up successfully.</AlertDescription>
+            <AlertTitle>{t("bak.done")}</AlertTitle>
+            <AlertDescription>{t("bak.success")}</AlertDescription>
           </Alert>
         )}
 
         {showErrorAlert && (
           <Alert icon={AlertCircle} variant="destructive" className="mb-4">
-            <AlertTitle>Backup Failed</AlertTitle>
-            <AlertDescription>{errorMessage ?? "An unknown error occurred"}</AlertDescription>
+            <AlertTitle>{t("bak.failed")}</AlertTitle>
+            <AlertDescription>{errorMessage ?? t("bak.unknownError")}</AlertDescription>
           </Alert>
         )}
 
         <NativeNoahButton
-          label="Backup Now"
+          label={t("bak.backupNow")}
           onPress={async () => {
             const result = await triggerBackup();
             if (result.isOk()) {
@@ -93,7 +93,7 @@ export const BackupSettingsScreen = () => {
 
         <View className="mt-8">
           <NativeNoahSecondaryButton
-            label="List Backups"
+            label={t("bak.viewBackups")}
             onPress={async () => {
               const result = await listBackups();
               if (result.isOk()) {
@@ -112,9 +112,9 @@ export const BackupSettingsScreen = () => {
 
           {showBackups && backupsList && (
             <View className="mb-4 p-4 bg-card rounded-lg border border-border">
-              <Text className="text-lg font-semibold mb-2">Available Backups</Text>
+              <Text className="text-lg font-semibold mb-2">{t("bak.available")}</Text>
               {backupsList.length === 0 ? (
-                <Text className="text-muted-foreground">No backups found</Text>
+                <Text className="text-muted-foreground">{t("bak.noBackups")}</Text>
               ) : (
                 backupsList.map((backup) => (
                   <View
@@ -130,7 +130,7 @@ export const BackupSettingsScreen = () => {
                     </View>
                     <View className="flex-row gap-2">
                       <NativeNoahButton
-                        label="Delete"
+                        label={t("bak.delete")}
                         variant="destructive"
                         size="sm"
                         onPress={() => deleteBackup(backup.backup_version)}
@@ -150,7 +150,7 @@ export const BackupSettingsScreen = () => {
         <View className="absolute inset-0 bg-black/50 items-center justify-center">
           <View className="bg-card p-6 rounded-lg items-center">
             <NoahActivityIndicator size="large" />
-            <Text className="text-foreground mt-4">Loading...</Text>
+            <Text className="text-foreground mt-4">{t("bak.loading")}</Text>
           </View>
         </View>
       )}

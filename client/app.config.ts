@@ -2,7 +2,7 @@ import { ExpoConfig } from "expo/config";
 
 const config: { expo: ExpoConfig } = {
   expo: {
-    name: "Noah",
+    name: "Thârk",
     slug: "noahs-ark-wallet",
     orientation: "portrait",
     userInterfaceStyle: "automatic",
@@ -21,20 +21,20 @@ const config: { expo: ExpoConfig } = {
         "expo-splash-screen",
         {
           backgroundColor: "#000000",
-          image: "./assets/1024_no_background.png",
+          image: "./assets/thark/adaptive-icon.png",
           imageWidth: 200,
           dark: {
             backgroundColor: "#000000",
-            image: "./assets/1024_no_background.png",
+            image: "./assets/thark/adaptive-icon.png",
           },
           ios: {
             backgroundColor: "#000000",
-            image: "./assets/1024_no_background.png",
+            image: "./assets/thark/adaptive-icon.png",
             imageWidth: 200,
           },
           android: {
             backgroundColor: "#000000",
-            image: "./assets/1024_no_background.png",
+            image: "./assets/thark/adaptive-icon.png",
             imageWidth: 200,
           },
         },
@@ -102,12 +102,12 @@ const config: { expo: ExpoConfig } = {
       infoPlist: {
         UIBackgroundModes: ["remote-notification", "fetch"],
       },
-      icon: "./assets/noah.icon",
+      icon: "./assets/thark/icon.png",
     },
     android: {
       adaptiveIcon: {
         foregroundImage:
-          "./assets/All_Files/android/Android_Adaptive/android_adaptive_foreground.png",
+          "./assets/thark/adaptive-icon.png",
         backgroundColor: "#000000",
       },
       package: "com.noahwallet",

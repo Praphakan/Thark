@@ -74,12 +74,17 @@ export const verifyMessage = async (
 };
 
 export const setMnemonic = async (mnemonic: string): Promise<Result<void, Error>> => {
-  await ResultAsync.fromPromise(
+  const result = await ResultAsync.fromPromise(
     Keychain.setGenericPassword(KEYCHAIN_USERNAME, mnemonic, {
       service: MNEMONIC_KEYCHAIN_SERVICE,
+      accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
     }),
     (e) => e as Error,
   );
+
+  if (result.isErr()) {
+    return err(result.error);
+  }
 
   return ok(undefined);
 };
