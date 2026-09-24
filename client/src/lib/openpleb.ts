@@ -22,6 +22,16 @@ function getMakerPrivKeyHex(): string {
     hex = bytesToHex(secretKey);
     mmkv.set(MAKER_PRIVKEY_STORAGE_KEY, hex);
   }
+  // Le backend reconstruit la clé publique du maker en "02" + x : la clé doit
+  // donc avoir une parité paire. Sinon on prend la clé opposée (même x, préfixe 02).
+  {
+    const priv = Uint8Array.from(hex!.match(/.{1,2}/g)!.map((b) => parseInt(b, 16)));
+    if (secp256k1.getPublicKey(priv, true)[0] === 3) {
+      const N = BigInt("0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141");
+      hex = ((N - BigInt("0x" + hex)) % N).toString(16).padStart(64, "0");
+      mmkv.set(MAKER_PRIVKEY_STORAGE_KEY, hex);
+    }
+  }
   return hex;
 }
 
@@ -212,7 +222,7 @@ export async function redeemRefundToken(refundToken: string): Promise<number> {
   //    On passe la clé privée maker pour déverrouiller l'ecash P2PK
   //    (le refund/caution est chiffré pour notre clé publique).
   const privkey = getMakerPrivKeyHex();
-  try { await wallet.meltProofsBolt11(meltQuote, proofs as any, { privkey }); } catch (e: any) { throw new Error("melt: " + (e?.message ?? e)); }
+  try { await wallet.meltProofsBolt11(meltQuote, proofs as any, { privkey }); } catch (e: any) { throw new Error("melt: " + (e?.message ?? e) + " | facture: " + realInvoice); }
 
   return amountToReceive;
 }
@@ -268,7 +278,11 @@ export function getPendingOffers(): number[] {
  * Parcourt les offres en attente et encaisse tout remboursement disponible.
  * À appeler au démarrage de l'app. Retourne le total de sats récupérés.
  */
+let refundsInFlight = false;
 export async function processPendingRefunds(): Promise<number> {
+  if (refundsInFlight) return 0;
+  refundsInFlight = true;
+  try {
   const list = getPendingOffers();
   let total = 0;
   for (const offerId of list) {
@@ -285,9 +299,13 @@ export async function processPendingRefunds(): Promise<number> {
           removePendingOffer(offerId);
         }
       }
-    } catch {
+    } catch (e: any) {
       // on réessaiera au prochain démarrage
+      console.warn("[refund] offre", offerId, ":", e?.message ?? String(e));
     }
   }
   return total;
+  } finally {
+    refundsInFlight = false;
+  }
 }
