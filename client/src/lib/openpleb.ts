@@ -6,7 +6,7 @@ import { secp256k1 } from "@noble/curves/secp256k1";
 import { bytesToHex } from "@noble/hashes/utils";
 import { mmkv } from "./mmkv";
 import { payLightningInvoice, bolt11Invoice } from "./paymentsApi";
-import { Wallet, Mint, getDecodedToken, getTokenMetadata } from "@cashu/cashu-ts";
+import { Wallet, Mint, getDecodedToken, getTokenMetadata, getEncodedToken } from "@cashu/cashu-ts";
 
 // ── Configuration du serveur ────────────────────────────────
 export const OPENPLEB_BASE_URL = "https://2-58-82-83.sslip.io";
@@ -157,7 +157,7 @@ async function cashuFetch<T = unknown>(args: any): Promise<T> {
       Accept: "application/json",
       ...(headers ?? {}),
     },
-    body: requestBody ? JSON.stringify(requestBody) : undefined,
+    body: requestBody ? JSON.stringify(requestBody, (_k, v) => (typeof v === "bigint" ? Number(v) : _k === "amount" && typeof v === "string" && /^\d+$/.test(v) ? Number(v) : v)) : undefined,
   });
   if (!res.ok) {
     const txt = await res.text();
@@ -222,7 +222,14 @@ export async function redeemRefundToken(refundToken: string): Promise<number> {
   //    On passe la clé privée maker pour déverrouiller l'ecash P2PK
   //    (le refund/caution est chiffré pour notre clé publique).
   const privkey = getMakerPrivKeyHex();
-  try { await wallet.meltProofsBolt11(meltQuote, proofs as any, { privkey }); } catch (e: any) { throw new Error("melt: " + (e?.message ?? e) + " | facture: " + realInvoice); }
+  try { await wallet.meltProofsBolt11(meltQuote, proofs as any, { privkey }); } catch (e: any) {
+    const msg = String(e?.message ?? e);
+    // Certains mints (ex. Minibits) refusent les factures Ark : on passe par un mint pont.
+    if (msg.includes("Invalid payment request")) {
+      return await bridgeToArk(wallet, proofs as any, totalSats, privkey, String((proofs[0] as any)?.C ?? "x").slice(0, 16));
+    }
+    throw new Error("melt: " + msg + " | facture: " + realInvoice);
+  }
 
   return amountToReceive;
 }
@@ -308,4 +315,83 @@ export async function processPendingRefunds(): Promise<number> {
   } finally {
     refundsInFlight = false;
   }
+}
+
+// ── TEMP : test de compatibilité mint ↔ factures Ark ────────
+async function testMintArkCompat(mintUrl: string, amount = 50): Promise<string> {
+  const mint = new Mint(mintUrl, { customRequest: cashuFetch });
+  const wallet = new Wallet(mint);
+  await wallet.loadMint();
+  const mq = await wallet.createMintQuoteBolt11(amount);
+  await payOfferInvoice(mq.request); // Thârk paie le mint
+  for (let i = 0; i < 20; i++) {
+    const st = await wallet.checkMintQuoteBolt11(mq.quote);
+    if (String(st.state) !== "UNPAID") break;
+    await new Promise((r) => setTimeout(r, 1500));
+  }
+  const proofs = await wallet.mintProofsBolt11(amount, mq.quote);
+  mmkv.set(`debug.minttest.${mintUrl}`, getEncodedToken({ mint: mintUrl, proofs }));
+  const inv = await bolt11Invoice(amount - 10);
+  if (inv.isErr()) return "❌ facture Ark impossible";
+  const mlt = await wallet.createMeltQuoteBolt11(inv.value.payment_request);
+  try {
+    await wallet.meltProofsBolt11(mlt, proofs as any);
+  } catch (e: any) {
+    return "❌ melt vers Ark refusé : " + (e?.message ?? String(e));
+  }
+  mmkv.set(`debug.minttest.${mintUrl}`, "");
+  return `✅ le mint a payé la facture Ark (${amount - 10} sats reçus)`;
+}
+
+export async function runMintArkTestsOnce(): Promise<void> {
+  if (mmkv.getString("debug.minttest.done2")) return;
+  mmkv.set("debug.minttest.done2", "1");
+  for (const m of ["https://mint.cubabitcoin.org", "https://mint.macadamia.cash"]) {
+    try { console.warn(`[minttest] ${m} :`, await testMintArkCompat(m)); }
+    catch (e: any) { console.warn(`[minttest] ${m} : ❌ ${e?.message ?? String(e)}`); }
+  }
+}
+
+
+// ── Pont vers Ark via un mint capable de payer les factures Ark ──
+const BRIDGE_MINT_URL = "https://mint.cubabitcoin.org";
+
+async function waitMintPaid(w: Wallet, quote: string): Promise<void> {
+  for (let i = 0; i < 30; i++) {
+    const st = await w.checkMintQuoteBolt11(quote);
+    if (String(st.state) !== "UNPAID") return;
+    await new Promise((r) => setTimeout(r, 2000));
+  }
+  throw new Error("Pont : paiement non confirmé par le mint pont");
+}
+
+async function bridgeToArk(src: Wallet, proofs: any[], totalSats: number, privkey: string, tag: string): Promise<number> {
+  const key = `bridge.pending.${tag}`;
+  const bWallet = new Wallet(new Mint(BRIDGE_MINT_URL, { customRequest: cashuFetch }));
+  await bWallet.loadMint();
+  // Saut 1 : le mint source paie une facture du mint pont
+  const probe = await src.createMeltQuoteBolt11((await bWallet.createMintQuoteBolt11(totalSats)).request);
+  const a1 = totalSats - Number(probe.fee_reserve ?? 0) - 1;
+  if (a1 <= 0) throw new Error("Pont : montant trop faible");
+  const mq = await bWallet.createMintQuoteBolt11(a1);
+  const mlt1 = await src.createMeltQuoteBolt11(mq.request);
+  mmkv.set(key, JSON.stringify({ step: "quote", mint: BRIDGE_MINT_URL, quote: mq.quote, amount: a1 }));
+  try { await src.meltProofsBolt11(mlt1, proofs, { privkey }); }
+  catch (e: any) { mmkv.set(key, ""); throw new Error("Pont saut 1 : " + (e?.message ?? String(e))); }
+  await waitMintPaid(bWallet, mq.quote);
+  const bProofs = await bWallet.mintProofsBolt11(a1, mq.quote);
+  mmkv.set(key, JSON.stringify({ step: "token", token: getEncodedToken({ mint: BRIDGE_MINT_URL, proofs: bProofs }) }));
+  // Saut 2 : le mint pont paie la facture Ark
+  const inFee = Number(bWallet.getFeesForProofs(bProofs));
+  const p2 = await bolt11Invoice(a1 - inFee);
+  if (p2.isErr()) throw new Error("Pont : facture Ark (sonde) impossible");
+  const q0 = await bWallet.createMeltQuoteBolt11(p2.value.payment_request);
+  const a2 = a1 - inFee - Number(q0.fee_reserve ?? 0) - 1;
+  const inv = await bolt11Invoice(a2);
+  if (inv.isErr()) throw new Error("Pont : facture Ark impossible");
+  const q = await bWallet.createMeltQuoteBolt11(inv.value.payment_request);
+  try { await bWallet.meltProofsBolt11(q, bProofs); }
+  catch (e: any) { throw new Error("Pont saut 2 (ecash Cuba sauvegardé) : " + (e?.message ?? String(e))); }
+  mmkv.set(key, "");
+  return a2;
 }
