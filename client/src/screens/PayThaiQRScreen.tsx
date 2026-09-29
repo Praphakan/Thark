@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  View, Text, ScrollView, Pressable, ActivityIndicator, TextInput,
+  View, Text, ScrollView, Pressable, ActivityIndicator, TextInput, Image,
 } from "react-native";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -10,7 +10,7 @@ import Icon from "@react-native-vector-icons/ionicons";
 import { parsePromptPay } from "~/lib/promptpay";
 import { t } from "~/lib/i18n";
 import {
-  createOffer, getOfferInvoice, payOfferInvoice, checkInvoicePaid, redeemOfferRefundIfAny, addPendingOffer, removePendingOffer, type OpenPlebOffer,
+  createOffer, getOfferInvoice, payOfferInvoice, checkInvoicePaid, redeemOfferRefundIfAny, addPendingOffer, removePendingOffer, getOffer, getOfferReceipt, sendMakerFeedback, type OpenPlebOffer,
 } from "~/lib/openpleb";
 import type { HomeStackParamList } from "~/Navigators";
 
@@ -30,6 +30,55 @@ export default function PayThaiQRScreen() {
   const [status, setStatus] = useState<string>("");
   const [busy, setBusy] = useState(false);
   const [waiting, setWaiting] = useState(false);
+  const [trackedOfferId, setTrackedOfferId] = useState<number | null>(null);
+  const [receiptImg, setReceiptImg] = useState<string | null>(null);
+  const [feedbackBusy, setFeedbackBusy] = useState(false);
+  const hadReceiptRef = useRef(false);
+
+  // Suivi en direct de l'offre jusqu'à sa résolution
+  const watchOffer = async (offerId: number) => {
+    setTrackedOfferId(offerId);
+    const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+    for (let i = 0; i < 450; i++) {
+      let o: any = null;
+      try { o = await getOffer(offerId); } catch { await sleep(4000); continue; }
+      if (o?.refund) {
+        try {
+          const sats = await redeemOfferRefundIfAny(offerId);
+          if (sats > 0) {
+            removePendingOffer(offerId);
+            setStatus(hadReceiptRef.current ? t("pay.completedBond", { n: sats }) : t("pay.refunded", { n: sats }));
+          }
+        } catch { setStatus(t("pay.refundPending")); }
+        setReceiptImg(null); setWaiting(false); return;
+      }
+      if (o?.status === "INVOICE_PAID") setStatus(t("pay.waitTaker"));
+      else if (o?.status === "CLAIMED") setStatus(t("pay.takerPaying"));
+      else if (o?.status === "MARKED_WITH_ISSUE") setStatus(t("pay.disputed"));
+      else if (o?.status === "RECEIPT_SUBMITTED" && !hadReceiptRef.current) {
+        try {
+          const img = await getOfferReceipt(offerId);
+          if (img) { hadReceiptRef.current = true; setReceiptImg(img); setStatus(t("pay.receiptReceived")); }
+        } catch {}
+      }
+      await sleep(4000);
+    }
+    setWaiting(false);
+  };
+
+  const handleFeedback = async (decision: "COMPLETED" | "MARKED_WITH_ISSUE") => {
+    if (trackedOfferId == null) return;
+    setFeedbackBusy(true);
+    try {
+      await sendMakerFeedback(trackedOfferId, decision, decision === "MARKED_WITH_ISSUE" ? "Paiement non reçu par le commerçant" : "");
+      setReceiptImg(null);
+      setStatus(decision === "COMPLETED" ? t("pay.confirmedWaitingBond") : t("pay.disputed"));
+    } catch (e: any) {
+      setStatus(`❌ ${e?.message ?? String(e)}`);
+    } finally {
+      setFeedbackBusy(false);
+    }
+  };
 
   const amountThb = parseFloat(amount) || 0;
 
@@ -100,22 +149,7 @@ export default function PayThaiQRScreen() {
       setStatus(t("pay.paidWaiting"));
       // Si aucun taker ne prend l'offre, elle expire et le montant est
       // remboursé automatiquement dans le wallet.
-      const offerId = offer.id;
-      setTimeout(async () => {
-        try {
-          const sats = await redeemOfferRefundIfAny(offerId);
-          if (sats > 0) {
-            removePendingOffer(offerId);
-            setStatus(t("pay.refunded", { n: sats }));
-          } else {
-            setStatus(t("pay.processing"));
-          }
-        } catch {
-          setStatus(t("pay.refundPending"));
-        } finally {
-          setWaiting(false);
-        }
-      }, 130000);
+      void watchOffer(offer.id);
     } catch (e: any) {
       setStatus(`❌ ${e?.message ?? String(e)}`);
     } finally {
@@ -248,6 +282,30 @@ export default function PayThaiQRScreen() {
             )}
           </Pressable>
         )}
+
+        {receiptImg ? (
+          <View className="mt-6 rounded-2xl bg-card p-4">
+            <Text className="text-foreground font-bold mb-2">{t("pay.receiptTitle")}</Text>
+            <Image source={{ uri: receiptImg }} style={{ width: "100%", height: 320 }} resizeMode="contain" />
+            <Text className="text-sm text-muted-foreground mt-3">{t("pay.verifyWithMerchant")}</Text>
+            <Pressable
+              onPress={() => handleFeedback("COMPLETED")}
+              disabled={feedbackBusy}
+              className="h-12 rounded-2xl items-center justify-center mt-4"
+              style={{ backgroundColor: COLORS.BITCOIN_ORANGE, opacity: feedbackBusy ? 0.5 : 1 }}
+            >
+              <Text className="font-bold" style={{ color: "#1a1a1a" }}>{t("pay.confirmReceived")}</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => handleFeedback("MARKED_WITH_ISSUE")}
+              disabled={feedbackBusy}
+              className="h-12 rounded-2xl items-center justify-center mt-3 border"
+              style={{ borderColor: "#888" }}
+            >
+              <Text className="text-foreground">{t("pay.reportIssue")}</Text>
+            </Pressable>
+          </View>
+        ) : null}
 
         {waiting ? (
           <View

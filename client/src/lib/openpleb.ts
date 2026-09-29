@@ -2,8 +2,9 @@
  * Thârk ↔ OpenPleb — Module de connexion au pont PromptPay/Lightning.
  */
 
-import { secp256k1 } from "@noble/curves/secp256k1";
-import { bytesToHex } from "@noble/hashes/utils";
+import { secp256k1, schnorr } from "@noble/curves/secp256k1";
+import { bytesToHex, hexToBytes, utf8ToBytes, randomBytes } from "@noble/hashes/utils";
+import { sha256 } from "@noble/hashes/sha2";
 import { mmkv } from "./mmkv";
 import { payLightningInvoice, bolt11Invoice } from "./paymentsApi";
 import { Wallet, Mint, getDecodedToken, getTokenMetadata, getEncodedToken } from "@cashu/cashu-ts";
@@ -394,4 +395,33 @@ async function bridgeToArk(src: Wallet, proofs: any[], totalSats: number, privke
   catch (e: any) { throw new Error("Pont saut 2 (ecash Cuba sauvegardé) : " + (e?.message ?? String(e))); }
   mmkv.set(key, "");
   return a2;
+}
+
+
+// ── Validation du maker ─────────────────────────────────────
+/** Capture de paiement envoyée par le taker (image encodée, affichable directement). */
+export async function getOfferReceipt(offerId: number): Promise<string | null> {
+  const res = await fetch(`${OPENPLEB_API}/offers/${offerId}/receipt`);
+  if (!res.ok) return null;
+  const data = await res.json();
+  return data?.receipt?.receiptImg ?? null;
+}
+
+/** Le maker confirme (COMPLETED) ou conteste (MARKED_WITH_ISSUE), signature Schnorr de sa clé. */
+export async function sendMakerFeedback(
+  offerId: number,
+  status: "COMPLETED" | "MARKED_WITH_ISSUE",
+  feedback = "",
+): Promise<void> {
+  const payload = { feedback, status }; // clés déjà dans l'ordre alphabétique attendu
+  const nonce = bytesToHex(randomBytes(32));
+  const timestamp = Date.now();
+  const hash = sha256(utf8ToBytes(nonce + timestamp + JSON.stringify(payload)));
+  const signature = bytesToHex(schnorr.sign(hash, hexToBytes(getMakerPrivKeyHex())));
+  const res = await fetch(`${OPENPLEB_API}/offers/${offerId}/feedback`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ payload, nonce, timestamp, signature }),
+  });
+  if (!res.ok) throw new Error(`Confirmation refusée (HTTP ${res.status}) : ${await res.text()}`);
 }
