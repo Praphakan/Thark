@@ -279,7 +279,7 @@ const translations: Record<string, { fr: string; en: string }> = {
   "earn.homeCard": { fr: "Gagner des sats", en: "Earn sats" },
   "earn.homeCardSub": { fr: "Payez des QR thaïs pour d'autres, recevez des sats", en: "Pay Thai QRs for others, receive sats" },
   "earn.intro": { fr: "Prenez une offre, payez le QR du commerçant depuis votre app bancaire, envoyez le reçu : vous recevez le montant en sats plus une prime.", en: "Take an offer, pay the merchant's QR from your banking app, send the receipt: you receive the amount in sats plus a bonus." },
-  "earn.none": { fr: "Aucune offre pour le moment. Les offres ne restent que 2 minutes : gardez cet écran ouvert.", en: "No offers right now. Offers only last 2 minutes: keep this screen open." },
+  "earn.none": { fr: "Aucune offre pour le moment. Les offres ne restent que 3 minutes : gardez cet écran ouvert.", en: "No offers right now. Offers only last 3 minutes: keep this screen open." },
   "earn.gain": { fr: "Prime : {n} sats", en: "Bonus: {n} sats" },
   "earn.bond": { fr: "Caution remboursable : {n} sats", en: "Refundable bond: {n} sats" },
   "earn.take": { fr: "Prendre cette offre", en: "Take this offer" },
