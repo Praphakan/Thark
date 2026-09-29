@@ -415,7 +415,15 @@ export async function sendMakerFeedback(
 ): Promise<void> {
   const payload = { feedback, status }; // clés déjà dans l'ordre alphabétique attendu
   const nonce = bytesToHex(randomBytes(32));
-  const timestamp = Date.now();
+  // Horodatage aligné sur l'heure du serveur : l'horloge d'un téléphone peut dériver
+  // de plusieurs minutes, et le backend refuse toute signature de plus d'une minute.
+  let timestamp = Date.now();
+  try {
+    const t0 = Date.now();
+    const r = await fetch(`${OPENPLEB_API}/conversion`);
+    const d = r.headers.get("date");
+    if (d) timestamp = Date.parse(d) + Math.round((Date.now() - t0) / 2) + 500;
+  } catch {}
   const hash = sha256(utf8ToBytes(nonce + timestamp + JSON.stringify(payload)));
   const signature = bytesToHex(schnorr.sign(hash, hexToBytes(getMakerPrivKeyHex())));
   const res = await fetch(`${OPENPLEB_API}/offers/${offerId}/feedback`, {

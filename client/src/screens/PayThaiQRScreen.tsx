@@ -30,6 +30,8 @@ export default function PayThaiQRScreen() {
   const [status, setStatus] = useState<string>("");
   const [busy, setBusy] = useState(false);
   const [waiting, setWaiting] = useState(false);
+  const [paid, setPaid] = useState(false);
+  const [result, setResult] = useState<null | { kind: "success" | "refund"; sats: number }>(null);
   const [trackedOfferId, setTrackedOfferId] = useState<number | null>(null);
   const [receiptImg, setReceiptImg] = useState<string | null>(null);
   const [feedbackBusy, setFeedbackBusy] = useState(false);
@@ -47,6 +49,7 @@ export default function PayThaiQRScreen() {
           const sats = await redeemOfferRefundIfAny(offerId);
           if (sats > 0) {
             removePendingOffer(offerId);
+            setResult({ kind: hadReceiptRef.current ? "success" : "refund", sats });
             setStatus(hadReceiptRef.current ? t("pay.completedBond", { n: sats }) : t("pay.refunded", { n: sats }));
           }
         } catch { setStatus(t("pay.refundPending")); }
@@ -141,6 +144,7 @@ export default function PayThaiQRScreen() {
       const invoice = await getOfferInvoice(offer.id);
       setStatus(t("pay.paying"));
       await payOfferInvoice(invoice);
+      setPaid(true);
       setStatus("Finalisation...");
       // Notifier le backend que la facture est payée (récupère l'ecash, passe l'offre à INVOICE_PAID)
       await checkInvoicePaid(offer.id);
@@ -269,19 +273,42 @@ export default function PayThaiQRScreen() {
         ) : (
           <Pressable
             onPress={handleConfirmPay}
-            disabled={busy}
+            disabled={busy || paid}
             className="h-14 rounded-2xl items-center justify-center mt-2"
-            style={{ backgroundColor: COLORS.BITCOIN_ORANGE }}
+            style={{ backgroundColor: paid ? "#9ca3af" : COLORS.BITCOIN_ORANGE, opacity: paid ? 0.7 : 1 }}
           >
             {busy ? (
               <ActivityIndicator color="#1a1a1a" />
             ) : (
               <Text className="font-bold" style={{ color: "#1a1a1a" }}>
-                {t("pay.confirmPay")}
+                {paid ? t("pay.paidLabel") : t("pay.confirmPay")}
               </Text>
             )}
           </Pressable>
         )}
+
+        {result ? (
+          <View
+            className="mt-6 rounded-3xl p-6 items-center"
+            style={{
+              backgroundColor: result.kind === "success" ? "#16a34a22" : "#F7931A22",
+              borderWidth: 1,
+              borderColor: result.kind === "success" ? "#16a34a" : COLORS.BITCOIN_ORANGE,
+            }}
+          >
+            <Icon
+              name={result.kind === "success" ? "checkmark-circle" : "arrow-undo-circle"}
+              size={72}
+              color={result.kind === "success" ? "#16a34a" : COLORS.BITCOIN_ORANGE}
+            />
+            <Text className="text-2xl font-bold text-foreground mt-3 text-center">
+              {result.kind === "success" ? t("pay.successTitle") : t("pay.refundTitle")}
+            </Text>
+            <Text className="text-base text-muted-foreground mt-2 text-center">
+              {result.kind === "success" ? t("pay.successBody", { n: result.sats }) : t("pay.refundBody", { n: result.sats })}
+            </Text>
+          </View>
+        ) : null}
 
         {receiptImg ? (
           <View className="mt-6 rounded-2xl bg-card p-4">
@@ -319,7 +346,7 @@ export default function PayThaiQRScreen() {
           </View>
         ) : null}
 
-        {status ? (
+        {status && !result ? (
           <View className="mt-6 rounded-xl bg-card p-4">
             <Text className="text-foreground text-sm" style={{ fontFamily: "monospace" }}>
               {status}
