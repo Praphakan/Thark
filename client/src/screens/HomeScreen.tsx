@@ -13,6 +13,8 @@ import { useBalance, useLoadWallet, useWalletSync } from "../hooks/useWallet";
 import Icon from "@react-native-vector-icons/ionicons";
 import { APP_VARIANT } from "~/config";
 import { t } from "~/lib/i18n";
+import { useIsFocused } from "@react-navigation/native";
+import { isTakerModeEnabled } from "~/lib/openpleb";
 import { PLATFORM } from "~/constants";
 import { useAppVersionCheck } from "~/hooks/useAppVersionCheck";
 import { UpdateWarningBanner } from "~/components/UpdateWarningBanner";
@@ -74,6 +76,8 @@ const getTransactionLabel = (transaction: Transaction) => {
 
 const HomeScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
+  useIsFocused(); // relit le réglage au retour sur l'accueil
+  const takerMode = isTakerModeEnabled();
   const iconColor = useIconColor();
   const formatBitcoinAmount = useBitcoinAmountFormatter();
   const parentNavigation = navigation.getParent<NavigationProp<TabParamList>>();
@@ -355,6 +359,20 @@ const HomeScreen = () => {
                     <Text className="mt-2 text-sm font-semibold">{t("home.thaiQr")}</Text>
                   </Pressable>
                 </View>
+                {takerMode ? (
+                  <Pressable
+                    className="mt-3 flex-row items-center p-4 rounded-2xl bg-card"
+                    onPress={() => navigation.navigate("Earn")}
+                    accessibilityRole="button"
+                  >
+                    <Icon name="cash-outline" size={26} color={COLORS.BITCOIN_ORANGE} />
+                    <View className="ml-3 flex-1">
+                      <Text className="text-base font-semibold">{t("earn.homeCard")}</Text>
+                      <Text className="text-xs text-muted-foreground">{t("earn.homeCardSub")}</Text>
+                    </View>
+                    <Icon name="chevron-forward" size={20} color="#888" />
+                  </Pressable>
+                ) : null}
                 {isOpen && (
                   <Animated.View entering={FadeInDown} exiting={FadeOutDown}>
                     <View className="p-4 rounded-lg bg-card mt-4 min-w-[300px]">

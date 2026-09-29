@@ -30,6 +30,7 @@ import LightningAddressScreen from "~/screens/LightningAddressScreen";
 import EmailVerificationScreen from "~/screens/EmailVerificationScreen";
 import { BackupSettingsScreen } from "~/screens/BackupSettingsScreen";
 import PayThaiQRScreen from "~/screens/PayThaiQRScreen";
+import EarnScreen from "~/screens/EarnScreen";
 import RestoreWalletScreen from "~/screens/RestoreWalletScreen";
 import ArkInfoScreen from "~/screens/ArkInfoScreen";
 import ExportDatabaseScreen from "~/screens/ExportDatabaseScreen";
@@ -106,6 +107,7 @@ export type OnboardingStackParamList = {
 export type HomeStackParamList = {
   Receive: undefined;
   PayThaiQR: { qrData: string };
+  Earn: undefined;
   HomeStack: undefined;
   BoardArk: undefined;
   QRHub: { startScan?: boolean } | undefined;
@@ -219,6 +221,11 @@ const HomeStackScreen = () => (
     <HomeStack.Screen
       name="PayThaiQR"
       component={PayThaiQRScreen}
+      options={{ headerShown: false, animation: "default" }}
+    />
+    <HomeStack.Screen
+      name="Earn"
+      component={EarnScreen}
       options={{ headerShown: false, animation: "default" }}
     />
     <HomeStack.Screen

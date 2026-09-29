@@ -1,4 +1,5 @@
 import { t } from "~/lib/i18n";
+import { isTakerModeEnabled, setTakerModeEnabled } from "~/lib/openpleb";
 import { Linking, Pressable, ScrollView, View, Image } from "react-native";
 import Constants from "expo-constants";
 import { useWalletStore } from "../store/walletStore";
@@ -61,6 +62,7 @@ const SettingsScreen = () => {
   const { isDark } = useTheme();
   const logoImage = isDark ? logoImageDark : logoImageLight;
   const [confirmText, setConfirmText] = useState("");
+  const [takerMode, setTakerMode] = useState(isTakerModeEnabled());
   const [isDeleteWalletDialogOpen, setIsDeleteWalletDialogOpen] = useState(false);
   const {
     isInitialized,
@@ -442,10 +444,19 @@ const SettingsScreen = () => {
             )}
             <View className="p-4 border-b border-border bg-card rounded-lg mb-2 flex-row justify-between items-center">
               <View className="flex-1">
+                <Label className="text-foreground text-lg">{t("set.takerMode")}</Label>
+                <Text className="text-base mt-1 text-muted-foreground">{t("set.takerModeDesc")}</Text>
+              </View>
+              <NativeSwitch
+                value={takerMode}
+                onValueChange={(v: boolean) => { setTakerModeEnabled(v); setTakerMode(v); }}
+              />
+            </View>
+            <View className="p-4 border-b border-border bg-card rounded-lg mb-2 flex-row justify-between items-center">
+              <View className="flex-1">
                 <Label className="text-foreground text-lg">{t("set.mailboxNotif")}</Label>
                 <Text className="text-base mt-1 text-muted-foreground">
                   {t("set.mailboxDesc")}
-                  payments in the background.
                 </Text>
               </View>
               <NativeSwitch

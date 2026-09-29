@@ -572,3 +572,7 @@ export async function processTakerPending(): Promise<void> {
     }
   }
 }
+
+const TAKER_MODE_KEY = "thark.takerMode";
+export function isTakerModeEnabled(): boolean { return mmkv.getString(TAKER_MODE_KEY) === "1"; }
+export function setTakerModeEnabled(v: boolean): void { mmkv.set(TAKER_MODE_KEY, v ? "1" : "0"); }
