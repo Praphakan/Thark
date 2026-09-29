@@ -310,6 +310,8 @@ export async function processPendingRefunds(): Promise<number> {
     } catch (e: any) {
       // on réessaiera au prochain démarrage
       console.warn("[refund] offre", offerId, ":", e?.message ?? String(e));
+      // Jeton déjà dépensé : plus rien à récupérer, on arrête de suivre cette offre
+      if (String(e?.message ?? e).includes("Already Spent")) removePendingOffer(offerId);
     }
   }
   return total;
@@ -399,9 +401,33 @@ async function bridgeToArk(src: Wallet, proofs: any[], totalSats: number, privke
 
 
 // ── Validation du maker ─────────────────────────────────────
-/** Capture de paiement envoyée par le taker (image encodée, affichable directement). */
+/** Horodatage aligné sur l'heure du serveur (l'horloge du téléphone peut dériver). */
+async function serverTimestamp(): Promise<number> {
+  let ts = Date.now();
+  try {
+    const t0 = Date.now();
+    const r = await fetch(`${OPENPLEB_API}/conversion`);
+    const d = r.headers.get("date");
+    if (d) ts = Date.parse(d) + Math.round((Date.now() - t0) / 2) + 500;
+  } catch {}
+  return ts;
+}
+
+/** Signature Schnorr du maker, au format attendu par verifyPayload du backend. */
+async function signAsMaker(payload: Record<string, string>) {
+  const sorted: Record<string, string> = {};
+  for (const k of Object.keys(payload).sort()) sorted[k] = payload[k];
+  const nonce = bytesToHex(randomBytes(32));
+  const timestamp = await serverTimestamp();
+  const hash = sha256(utf8ToBytes(nonce + timestamp + JSON.stringify(sorted)));
+  const signature = bytesToHex(schnorr.sign(hash, hexToBytes(getMakerPrivKeyHex())));
+  return { nonce, timestamp, signature };
+}
+
+/** Capture de paiement du taker : lecture réservée au maker, demande signée. */
 export async function getOfferReceipt(offerId: number): Promise<string | null> {
-  const res = await fetch(`${OPENPLEB_API}/offers/${offerId}/receipt`);
+  const { nonce, timestamp, signature } = await signAsMaker({ action: "view_receipt", offerId: String(offerId) });
+  const res = await fetch(`${OPENPLEB_API}/offers/${offerId}/receipt?nonce=${nonce}&timestamp=${timestamp}&signature=${signature}`);
   if (!res.ok) return null;
   const data = await res.json();
   return data?.receipt?.receiptImg ?? null;
