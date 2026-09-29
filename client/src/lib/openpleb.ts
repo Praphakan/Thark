@@ -540,7 +540,7 @@ export async function takerSubmitReceipt(offerId: number, dataUrl: string): Prom
 }
 
 /** Récompense du taker (jeton verrouillé sur sa clé), encaissée dans Ark. */
-export async function redeemTakerRewardIfAny(offerId: number): Promise<number> {
+async function redeemTakerRewardInner(offerId: number): Promise<number> {
   const res = await fetch(`${OPENPLEB_API}/data/for/${offerId}`);
   if (!res.ok) return 0;
   const d = await res.json();
@@ -576,3 +576,19 @@ export async function processTakerPending(): Promise<void> {
 const TAKER_MODE_KEY = "thark.takerMode";
 export function isTakerModeEnabled(): boolean { return mmkv.getString(TAKER_MODE_KEY) === "1"; }
 export function setTakerModeEnabled(v: boolean): void { mmkv.set(TAKER_MODE_KEY, v ? "1" : "0"); }
+
+const rewardInFlight = new Set<number>();
+/** Encaissement de la récompense, une seule tentative à la fois par offre. */
+export async function redeemTakerRewardIfAny(offerId: number): Promise<number> {
+  if (rewardInFlight.has(offerId)) return 0;
+  rewardInFlight.add(offerId);
+  try {
+    return await redeemTakerRewardInner(offerId);
+  } catch (e: any) {
+    // Jeton déjà dépensé = déjà encaissé (par une autre tentative) : rien à signaler
+    if (String(e?.message ?? e).includes("Already Spent")) { removeTakerClaim(offerId); return 0; }
+    throw e;
+  } finally {
+    rewardInFlight.delete(offerId);
+  }
+}

@@ -107,6 +107,18 @@ export default function PayThaiQRScreen() {
   const thbOf = (sats: number) =>
     costs && costs.base > 0 ? (amountThb * sats) / costs.base : 0;
 
+  // Reprise du suivi d'une transaction depuis la bannière de l'accueil
+  const resumeRoute = useRoute<any>();
+  useEffect(() => {
+    const id = resumeRoute.params?.resumeOfferId;
+    if (!id) return;
+    (async () => {
+      try { setOffer(await getOffer(id)); } catch {}
+      setPaid(true); setWaiting(true); void watchOffer(id);
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Étape 1 : créer l'offre pour obtenir le détail des coûts
   const handleCreateOffer = async () => {
     if (amountThb <= 0) {

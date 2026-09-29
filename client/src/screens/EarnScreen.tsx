@@ -27,8 +27,11 @@ export default function EarnScreen() {
   const [reward, setReward] = useState<number | null>(null);
   const [now, setNow] = useState(Date.now());
   const trackedRef = useRef<number | null>(null);
+  const refreshingRef = useRef(false);
 
   const refresh = useCallback(async () => {
+    if (refreshingRef.current) return;
+    refreshingRef.current = true;
     try {
       const me = takerPubKey();
       const { offers: all, claims } = await getMarketData();
@@ -49,6 +52,7 @@ export default function EarnScreen() {
       setError(e?.message ?? String(e));
     } finally {
       setLoading(false);
+      refreshingRef.current = false;
     }
   }, []);
 

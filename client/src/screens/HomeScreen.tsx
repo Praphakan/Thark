@@ -14,7 +14,7 @@ import Icon from "@react-native-vector-icons/ionicons";
 import { APP_VARIANT } from "~/config";
 import { t } from "~/lib/i18n";
 import { useIsFocused } from "@react-navigation/native";
-import { isTakerModeEnabled } from "~/lib/openpleb";
+import { isTakerModeEnabled, getPendingOffers, getOffer } from "~/lib/openpleb";
 import { PLATFORM } from "~/constants";
 import { useAppVersionCheck } from "~/hooks/useAppVersionCheck";
 import { UpdateWarningBanner } from "~/components/UpdateWarningBanner";
@@ -359,6 +359,28 @@ const HomeScreen = () => {
                     <Text className="mt-2 text-sm font-semibold">{t("home.thaiQr")}</Text>
                   </Pressable>
                 </View>
+                {getPendingOffers().length > 0 ? (
+                  <Pressable
+                    className="mt-3 flex-row items-center p-4 rounded-2xl"
+                    style={{ backgroundColor: "#F7931A20", borderWidth: 1, borderColor: COLORS.BITCOIN_ORANGE }}
+                    onPress={async () => {
+                      const ids = getPendingOffers();
+                      const id = ids[ids.length - 1];
+                      try {
+                        const o = await getOffer(id);
+                        navigation.navigate("PayThaiQR", { qrData: o.qrCode, resumeOfferId: id });
+                      } catch {}
+                    }}
+                    accessibilityRole="button"
+                  >
+                    <Icon name="time-outline" size={26} color={COLORS.BITCOIN_ORANGE} />
+                    <View className="ml-3 flex-1">
+                      <Text className="text-base font-semibold">{t("home.ongoing")}</Text>
+                      <Text className="text-xs text-muted-foreground">{t("home.ongoingSub")}</Text>
+                    </View>
+                    <Icon name="chevron-forward" size={20} color="#888" />
+                  </Pressable>
+                ) : null}
                 {takerMode ? (
                   <Pressable
                     className="mt-3 flex-row items-center p-4 rounded-2xl bg-card"

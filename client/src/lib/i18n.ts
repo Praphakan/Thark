@@ -299,6 +299,8 @@ const translations: Record<string, { fr: string; en: string }> = {
   "earn.ok": { fr: "OK", en: "OK" },
   "set.takerMode": { fr: "Mode taker", en: "Taker mode" },
   "set.takerModeDesc": { fr: "Gagnez des sats en payant des QR thaïs pour d'autres utilisateurs.", en: "Earn sats by paying Thai QRs for other users." },
+  "home.ongoing": { fr: "Transaction en cours", en: "Transaction in progress" },
+  "home.ongoingSub": { fr: "Toucher pour suivre et valider le paiement", en: "Tap to follow and confirm the payment" },
   "tab.home": { fr: "Accueil", en: "Home" },
   "tab.scan": { fr: "Scanner", en: "Scan" },
   "tab.history": { fr: "Historique", en: "History" },

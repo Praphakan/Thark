@@ -106,7 +106,7 @@ export type OnboardingStackParamList = {
 
 export type HomeStackParamList = {
   Receive: undefined;
-  PayThaiQR: { qrData: string };
+  PayThaiQR: { qrData: string; resumeOfferId?: number };
   Earn: undefined;
   HomeStack: undefined;
   BoardArk: undefined;
