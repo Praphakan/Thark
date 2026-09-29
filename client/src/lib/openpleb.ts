@@ -459,3 +459,116 @@ export async function sendMakerFeedback(
   });
   if (!res.ok) throw new Error(`Confirmation refusée (HTTP ${res.status}) : ${await res.text()}`);
 }
+
+
+// ── Mode taker ──────────────────────────────────────────────
+const TAKER_CLAIMS_KEY = "openpleb.taker.claims";
+const TAKER_BONDS_KEY = "openpleb.taker.bonds";
+const ACTIVE_STATES = ["INVOICE_PAID", "CLAIMED", "RECEIPT_SUBMITTED", "MARKED_WITH_ISSUE", "FOREFEIT"];
+let backendMintUrl: string | null = null;
+type SavedBond = { offerId: number; token: string };
+
+/** Identité taker : même clé que le maker, au format x-only attendu par le backend. */
+export function takerPubKey(): string {
+  return getMakerPubKey().slice(2);
+}
+function readList<T>(key: string): T[] {
+  try { const raw = mmkv.getString(key); return raw ? JSON.parse(raw) : []; } catch { return []; }
+}
+function writeList<T>(key: string, v: T[]): void { mmkv.set(key, JSON.stringify(v)); }
+export function getTakerClaims(): number[] { return readList<number>(TAKER_CLAIMS_KEY); }
+function addTakerClaim(id: number): void {
+  const l = getTakerClaims(); if (!l.includes(id)) { l.push(id); writeList(TAKER_CLAIMS_KEY, l); }
+}
+function removeTakerClaim(id: number): void { writeList(TAKER_CLAIMS_KEY, getTakerClaims().filter((x) => x !== id)); }
+function removeSavedBond(offerId: number): void {
+  writeList(TAKER_BONDS_KEY, readList<SavedBond>(TAKER_BONDS_KEY).filter((b) => b.offerId !== offerId));
+}
+
+export function offerBondSats(o: any): number { return Number(o.bondFlatRate) + Number(o.bondPercentage); }
+export function offerRewardSats(o: any): number { return Number(o.takerFeeFlatRate) + Number(o.takerFeePercentage); }
+
+/** Offres disponibles et claims du taker. */
+export async function getMarketData(): Promise<{ offers: any[]; claims: any[] }> {
+  const res = await fetch(`${OPENPLEB_API}/data/${takerPubKey()}`);
+  if (!res.ok) throw new Error(`Marché indisponible (HTTP ${res.status})`);
+  const d = await res.json();
+  if (d?.env?.OPENPLEB_MINT_URL) backendMintUrl = d.env.OPENPLEB_MINT_URL;
+  return { offers: d?.offers ?? [], claims: d?.claims ?? [] };
+}
+
+/** Thârk paie le mint depuis son solde Ark et obtient de l'ecash du montant exact. */
+async function mintEcashFromArk(amount: number): Promise<string> {
+  if (!backendMintUrl) await getMarketData();
+  const mintUrl = backendMintUrl!;
+  const w = new Wallet(new Mint(mintUrl, { customRequest: cashuFetch }));
+  await w.loadMint();
+  const mq = await w.createMintQuoteBolt11(amount);
+  // Trace de secours si l'app s'arrête entre le paiement et l'émission
+  mmkv.set("openpleb.taker.pendingMint", JSON.stringify({ mintUrl, quote: mq.quote, amount }));
+  await payOfferInvoice(mq.request);
+  await waitMintPaid(w, mq.quote);
+  const proofs = await w.mintProofsBolt11(amount, mq.quote);
+  mmkv.set("openpleb.taker.pendingMint", "");
+  return getEncodedToken({ mint: mintUrl, proofs });
+}
+
+/** Prendre une offre : caution payée depuis Ark, puis claim. */
+export async function takerClaimOffer(offer: any): Promise<void> {
+  const token = await mintEcashFromArk(offerBondSats(offer));
+  const bonds = readList<SavedBond>(TAKER_BONDS_KEY);
+  bonds.push({ offerId: offer.id, token });
+  writeList(TAKER_BONDS_KEY, bonds);
+  const res = await fetch(`${OPENPLEB_API}/offers/${offer.id}/claim`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ pubkey: takerPubKey(), bond: token }),
+  });
+  if (!res.ok) throw new Error(`Offre non obtenue (HTTP ${res.status}) : ${await res.text()}`);
+  removeSavedBond(offer.id);
+  addTakerClaim(offer.id);
+}
+
+/** Envoi de la capture du reçu bancaire (image encodée en data URL). */
+export async function takerSubmitReceipt(offerId: number, dataUrl: string): Promise<void> {
+  const res = await fetch(`${OPENPLEB_API}/offers/${offerId}/receipt`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ receipt: dataUrl, pubkey: takerPubKey() }),
+  });
+  if (!res.ok) throw new Error(`Reçu refusé (HTTP ${res.status}) : ${await res.text()}`);
+}
+
+/** Récompense du taker (jeton verrouillé sur sa clé), encaissée dans Ark. */
+export async function redeemTakerRewardIfAny(offerId: number): Promise<number> {
+  const res = await fetch(`${OPENPLEB_API}/data/for/${offerId}`);
+  if (!res.ok) return 0;
+  const d = await res.json();
+  const reward = d?.claim?.reward;
+  if (!reward) {
+    const st = d?.offer?.status;
+    if (st && !ACTIVE_STATES.includes(st)) removeTakerClaim(offerId); // terminée sans récompense
+    return 0;
+  }
+  const sats = await redeemRefundToken(reward);
+  removeTakerClaim(offerId);
+  return sats;
+}
+
+/** Au démarrage : récompenses en attente + cautions restées en suspens après un claim raté. */
+export async function processTakerPending(): Promise<void> {
+  for (const id of getTakerClaims()) {
+    try { await redeemTakerRewardIfAny(id); }
+    catch (e: any) {
+      console.warn("[taker] récompense", id, ":", e?.message ?? String(e));
+      if (String(e?.message ?? e).includes("Already Spent")) removeTakerClaim(id);
+    }
+  }
+  for (const b of readList<SavedBond>(TAKER_BONDS_KEY)) {
+    try { await redeemRefundToken(b.token); removeSavedBond(b.offerId); }
+    catch (e: any) {
+      console.warn("[taker] caution", b.offerId, ":", e?.message ?? String(e));
+      if (String(e?.message ?? e).includes("Already Spent")) removeSavedBond(b.offerId);
+    }
+  }
+}
