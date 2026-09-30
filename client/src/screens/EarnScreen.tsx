@@ -3,6 +3,7 @@ import { View, Text, ScrollView, Pressable, ActivityIndicator, Alert } from "rea
 import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import QRCode from "react-native-qrcode-svg";
+import Share from "react-native-share";
 import Icon from "@react-native-vector-icons/ionicons";
 import { NoahSafeAreaView } from "~/components/NoahSafeAreaView";
 import { COLORS } from "~/lib/styleConstants";
@@ -27,6 +28,7 @@ export default function EarnScreen() {
   const [reward, setReward] = useState<number | null>(null);
   const [now, setNow] = useState(Date.now());
   const trackedRef = useRef<number | null>(null);
+  const qrRef = useRef<any>(null);
   const refreshingRef = useRef(false);
 
   const refresh = useCallback(async () => {
@@ -78,6 +80,18 @@ export default function EarnScreen() {
         },
       },
     ]);
+  };
+
+  // Export du QR en image : partage vers l'app bancaire ou enregistrement dans la galerie
+  const shareQr = () => {
+    if (!qrRef.current) return;
+    qrRef.current.toDataURL(async (data: string) => {
+      try {
+        await Share.open({ url: `data:image/png;base64,${data}`, type: "image/png", filename: `thark-qr-${active?.id ?? "offre"}`, failOnCancel: false });
+      } catch (err: any) {
+        setError(err?.message ?? String(err));
+      }
+    });
   };
 
   const sendReceipt = async () => {
@@ -132,9 +146,17 @@ export default function EarnScreen() {
             {active.status === "CLAIMED" ? (
               <>
                 <View className="mt-4 p-3 rounded-xl" style={{ backgroundColor: "#ffffff" }}>
-                  <QRCode value={active.qrCode} size={240} />
+                  <QRCode value={active.qrCode} size={240} quietZone={16} backgroundColor="#ffffff" getRef={(c: any) => (qrRef.current = c)} />
                 </View>
                 <Text className="text-sm text-muted-foreground mt-4 text-center">{t("earn.payHelp")}</Text>
+                <Pressable
+                  onPress={shareQr}
+                  className="h-12 w-full rounded-2xl items-center justify-center mt-4 border flex-row"
+                  style={{ borderColor: COLORS.BITCOIN_ORANGE }}
+                >
+                  <Icon name="share-social-outline" size={20} color={COLORS.BITCOIN_ORANGE} />
+                  <Text className="ml-2 font-semibold" style={{ color: COLORS.BITCOIN_ORANGE }}>{t("earn.shareQr")}</Text>
+                </Pressable>
                 <Pressable
                   onPress={sendReceipt}
                   disabled={!!busy}
