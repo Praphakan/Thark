@@ -71,7 +71,7 @@ const QRHubScreen = () => {
       lower.startsWith("tark") ||
       lower.includes("@"); // adresse Lightning
     if (looksBitcoin) {
-      navigation.navigate("Send", { destination: v });
+      navigation.navigate("Home", { screen: "Send", params: { destination: v } } as any);
       return;
     }
 
@@ -237,7 +237,7 @@ const QRHubScreen = () => {
                   </Text>
                   <NativeNoahButton
                     label="Open Profile"
-                    onPress={() => navigation.navigate("Settings", { screen: "Profile" })}
+                    onPress={() => navigation.navigate("Home", { screen: "Settings", params: { screen: "Profile" } } as any)}
                     className="mt-5 h-12 rounded-2xl"
                     fullWidth
                   />
