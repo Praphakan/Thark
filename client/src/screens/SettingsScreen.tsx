@@ -553,14 +553,7 @@ const SettingsScreen = () => {
               {isDebugModeEnabled && " 🔧"}
             </Text>
           </Pressable>
-          <Pressable onPress={handleSupportPress} className="mb-1">
-            <Text className="text-muted-foreground text-sm text-center">
-              For support, reach us on{" "}
-              <Text className="text-sm font-semibold" style={{ color: COLORS.BITCOIN_ORANGE }}>
-                Telegram
-              </Text>
-            </Text>
-          </Pressable>
+          {/* Support Telegram de Noah retiré (Thârk) : à rebrancher sur le canal Thârk */}
           <Text className="text-muted-foreground text-sm">{t("set.madeWith")}</Text>
         </View>
       </ScrollView>
