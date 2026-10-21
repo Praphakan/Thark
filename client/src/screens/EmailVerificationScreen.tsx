@@ -62,12 +62,24 @@ const EmailVerificationScreen = () => {
   const registerMutation = useServerRegistrationMutation();
   const isChangingEmail = Boolean(fromSettings && isEmailVerified);
 
+  // Thârk : pas d'email. Pendant l'inscription, cet écran se limite à
+  // l'enregistrement auprès du serveur, puis passe à l'étape suivante.
   useEffect(() => {
-    if (fromSettings || isRegisteredWithServer) {
+    if (fromSettings) {
       return;
     }
-    log.i("Registering with server before email verification...");
+    const goNext = () => {
+      const nav: any = navigation;
+      const go = nav.replace ?? nav.navigate;
+      go(shouldUseUnifiedPush() ? "UnifiedPush" : "LightningAddress", { fromOnboarding: true });
+    };
+    if (isRegisteredWithServer) {
+      goNext();
+      return;
+    }
+    log.i("Registering with server...");
     registerMutation.mutate(undefined, {
+      onSuccess: goNext,
       onError: () => navigation.goBack(),
     });
   }, []);
@@ -191,7 +203,7 @@ const EmailVerificationScreen = () => {
     await handleSendCode();
   };
 
-  if (registerMutation.isPending) {
+  if (registerMutation.isPending || !fromSettings) {
     return (
       <NoahSafeAreaView className="flex-1 bg-background">
         <View className="flex-1 justify-center items-center p-4">

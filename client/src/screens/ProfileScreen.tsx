@@ -255,43 +255,7 @@ const ProfileScreen = () => {
             </View>
           </View>
 
-          <View className="mt-8">
-            <Text className="text-sm font-semibold uppercase tracking-[2px] text-muted-foreground">
-              {t("prof.emergencyEmail")}
-            </Text>
-            <View
-              className="mt-3 overflow-hidden rounded-[18px] border"
-              style={{
-                borderColor: `${colors.mutedForeground}24`,
-                backgroundColor: `${colors.card}CC`,
-              }}
-            >
-              {isEmailVerified && emailAddress ? (
-                <CopyRow label="Address" value={emailAddress} />
-              ) : (
-                <View className="px-4 py-4">
-                  <Text className="text-base font-semibold text-foreground">
-                    {isEmailVerified ? t("prof.emergencyAlertsOn") : t("prof.noEmergencyEmail")}
-                  </Text>
-                  <Text className="mt-1 text-sm text-muted-foreground">
-                    {isEmailVerified
-                      ? t("prof.addressAfterSync")
-                      : t("prof.emergencyAlertsDesc")}
-                  </Text>
-                </View>
-              )}
-              <View className="h-px bg-border" />
-              <Pressable
-                onPress={() => navigation.navigate("EmailVerification", { fromSettings: true })}
-                className="flex-row items-center justify-between px-4 py-4"
-              >
-                <Text className="text-base font-semibold text-foreground">
-                  {isEmailVerified ? t("prof.editEmergencyEmail") : t("prof.addEmergencyEmail")}
-                </Text>
-                <Icon name="chevron-forward-outline" size={22} color={iconColor} />
-              </Pressable>
-            </View>
-          </View>
+          {/* Email d'urgence retiré (Thârk) */}
 
           {derivedKeyPair?.public_key ? (
             <View className="mt-8">
