@@ -9,6 +9,16 @@ Thârk is a self-custodial Bitcoin wallet (Ark + Lightning) for Android, **forke
 
 > ⚠️ **Beta software.** Thârk is under active development. Only use small amounts you can afford to lose.
 
+## The name
+
+**Thârk** blends three ideas:
+
+- **TH**, for Thailand, where it was born.
+- **Ark**, the Bitcoin layer-2 protocol it is built on (and a nod to Noah, the wallet it was forked from).
+- **ท่า** (*thâ*), the Thai word for a pier or boat landing, the place where ferries cast off to cross the river. The circumflex in Thârk echoes its falling tone.
+
+A landing from which an ark crosses between two shores: baht and bitcoin.
+
 ## Standing on the shoulders of pioneers
 
 The idea of paying Thai QR codes with bitcoin through locals who settle in baht was pioneered by **[PlebQR](https://plebqr.com)**, which proved that a P2P "let me pay for you" market can make bitcoin spendable at virtually any shop in Thailand. Thârk is directly inspired by their work, and builds on the open-source [OpenPleb](https://github.com/gandlafbtc/open-pleb) project to bring that experience into a self-custodial Ark wallet.
