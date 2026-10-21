@@ -1,5 +1,8 @@
 # Thârk
 
+<img width="1244" height="520" alt="Capture d’écran 2026-10-21 à 20 40 54" src="https://github.com/user-attachments/assets/0a6ba9b3-ad13-4107-8226-25bc936adccf" />
+
+
 **Pay any Thai QR code with bitcoin.**
 
 Thârk is a self-custodial Bitcoin wallet (Ark + Lightning) for Android, **forked from [Noah](https://github.com/smolcars/noah)**, that lets you pay any Thai PromptPay QR code with sats. A peer-to-peer network of "takers" pays the merchant in baht and earns sats in return, using [OpenPleb](https://github.com/gandlafbtc/open-pleb) as the P2P fiat bridge.
