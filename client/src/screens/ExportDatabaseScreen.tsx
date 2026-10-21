@@ -47,7 +47,7 @@ const ExportDatabaseScreen = () => {
             <Download size={32} color={COLORS.BITCOIN_ORANGE} />
           </View>
           <Text className="mt-5 text-center text-xl font-bold text-foreground">
-            Export encrypted backup
+            {t("ui.060")}
           </Text>
           <Text className="mt-3 text-center text-base leading-6 text-muted-foreground">
             {t("exp.info")}

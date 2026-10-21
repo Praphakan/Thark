@@ -235,10 +235,10 @@ const ProfileScreen = () => {
               ) : (
                 <View className="px-4 py-4">
                   <Text className="text-base font-semibold text-foreground">
-                    Aucune adresse Lightning définie
+                    {t("ui.071")}
                   </Text>
                   <Text className="mt-1 text-sm text-muted-foreground">
-                    Create one to receive payments with your QR code.
+                    {t("ui.072")}
                   </Text>
                 </View>
               )}
@@ -248,7 +248,7 @@ const ProfileScreen = () => {
                 className="flex-row items-center justify-between px-4 py-4"
               >
                 <Text className="text-base font-semibold text-foreground">
-                  Changer l'adresse Lightning
+                  {t("ui.073")}
                 </Text>
                 <Icon name="chevron-forward-outline" size={22} color={iconColor} />
               </Pressable>

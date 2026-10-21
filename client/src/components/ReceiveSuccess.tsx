@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import React, { useEffect } from "react";
 import { View } from "react-native";
 import Animated, { FadeInUp, ZoomIn } from "react-native-reanimated";
@@ -61,7 +62,7 @@ export const ReceiveSuccess: React.FC<ReceiveSuccessProps> = ({
               </Text>
             )}
             <Text className="mt-6 text-center text-2xl font-bold text-foreground">
-              Funds received
+              {t("ui.026")}
             </Text>
           </Animated.View>
 

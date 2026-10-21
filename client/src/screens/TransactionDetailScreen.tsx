@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import { View, Pressable, ScrollView, Linking } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import { Text } from "../components/ui/text";
@@ -189,7 +190,7 @@ export const TransactionDetailContent = ({
       {hasOnchainWalletDetails ? (
         <View className="bg-card p-4 rounded-lg mb-4">
           <Text className="text-lg font-semibold text-foreground mb-3">
-            Onchain Wallet Transaction
+            {t("ui.091")}
           </Text>
           {transaction.txid ? (
             <TransactionDetailRow
@@ -217,7 +218,7 @@ export const TransactionDetailContent = ({
           ) : null}
           {typeof transaction.confirmationHeight === "number" ? (
             <TransactionDetailRow
-              label="Confirmation Height"
+              label={t("ui.092")}
               value={transaction.confirmationHeight.toString()}
             />
           ) : null}

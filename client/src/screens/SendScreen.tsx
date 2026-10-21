@@ -163,7 +163,7 @@ const SendScreen = () => {
             <View className="px-5 pb-8">
               <View className="pt-2">
                 <Text className="text-[11px] font-semibold uppercase tracking-[3px] text-muted-foreground">
-                  Envoyer des bitcoins
+                  {t("ui.089")}
                 </Text>
                 <Text className="mt-2 max-w-[320px] text-base leading-6 text-muted-foreground">
                   {t("send.prompt")}

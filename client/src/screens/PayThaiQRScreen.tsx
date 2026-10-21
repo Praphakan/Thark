@@ -184,7 +184,7 @@ export default function PayThaiQRScreen() {
         </View>
         <View className="flex-1 items-center justify-center px-6">
           <Text className="text-center text-muted-foreground">
-            Ce QR n'est pas un QR PromptPay valide.
+            {t("ui.070")}
           </Text>
         </View>
       </NoahSafeAreaView>

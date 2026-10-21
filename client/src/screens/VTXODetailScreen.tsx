@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import { View, Pressable, ScrollView, Linking } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -167,7 +168,7 @@ const VTXODetailScreen = () => {
             <StatusBannerStrip
               className="mb-4"
               title={isExpired ? "VTXO expired" : "VTXO expiring soon"}
-              message="Refresh this VTXO to keep it available."
+              message={t("ui.103")}
               icon={
                 <Icon
                   name={isExpired ? "alert-circle-outline" : "warning-outline"}
@@ -204,12 +205,12 @@ const VTXODetailScreen = () => {
             <VTXODetailRow label="State" value={vtxo.state} />
             <VTXODetailRow label="Status" value={statusLabel} />
             <VTXODetailRow
-              label="Current Block Height"
+              label={t("ui.104")}
               value={blockHeight ? blockHeight.toLocaleString() : "Loading..."}
             />
             <VTXODetailRow label="Expiry Height" value={vtxo.expiry_height.toLocaleString()} />
             <VTXODetailRow
-              label="Blocks Until Expiry"
+              label={t("ui.105")}
               value={
                 blockHeight
                   ? vtxo.expiry_height > blockHeight
@@ -230,7 +231,7 @@ const VTXODetailScreen = () => {
               copyable
               explorerUrl={anchorExplorerUrl}
             />
-            <VTXODetailRow label="Server Public Key" value={vtxo.server_pubkey} copyable />
+            <VTXODetailRow label={t("ui.106")} value={vtxo.server_pubkey} copyable />
           </View>
         </ScrollView>
       </View>

@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import React, { useEffect, useState } from "react";
 import { AlertCircle, CheckCircle, CloudUpload } from "lucide-react-native";
 import { NoahActivityIndicator } from "~/components/ui/NoahActivityIndicator";
@@ -67,8 +68,8 @@ export const BackupStatusBanner: React.FC = () => {
   const { title, message, icon, tone, actionLabel } = (() => {
     if (showInProgress) {
       return {
-        title: "Backing up wallet",
-        message: "Running in background",
+        title: t("ui.012"),
+        message: t("ui.013"),
         icon: <NoahActivityIndicator size="small" />,
         tone: "info" as StatusBannerTone,
         actionLabel: null,
@@ -78,7 +79,7 @@ export const BackupStatusBanner: React.FC = () => {
     if (showFailed) {
       return {
         title: "Backup failed",
-        message: lastBackupError ?? "An unknown error occurred while backing up.",
+        message: lastBackupError ?? t("ui.014"),
         icon: <AlertCircle size={16} color="#ef4444" />,
         tone: "failed" as StatusBannerTone,
         actionLabel: "Retry",
@@ -87,7 +88,7 @@ export const BackupStatusBanner: React.FC = () => {
 
     if (showSuccess) {
       return {
-        title: "Backup completed",
+        title: t("ui.015"),
         message: lastBackupAt ? `Last backup ${formatBackupTime(lastBackupAt)}` : "Saved",
         icon: <CheckCircle size={16} color="#22c55e" />,
         tone: "success" as StatusBannerTone,
@@ -97,9 +98,9 @@ export const BackupStatusBanner: React.FC = () => {
 
     const isFirstBackup = !lastBackupAt;
     return {
-      title: isFirstBackup ? "Backup pending" : "Backup recommended",
+      title: isFirstBackup ? t("ui.009") : t("ui.010"),
       message: isFirstBackup
-        ? "Waiting for first backup"
+        ? t("ui.011")
         : lastBackupAt
           ? `Last backup ${formatBackupTime(lastBackupAt)}`
           : "Backup is due",

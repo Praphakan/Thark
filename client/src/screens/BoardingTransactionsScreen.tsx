@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import { View, Pressable, ActivityIndicator } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Share from "react-native-share";
@@ -83,7 +84,7 @@ const BoardingTransactionsScreen = () => {
 
     const shareResult = await ResultAsync.fromPromise(
       Share.open({
-        title: "Export Boarding Transactions",
+        title: t("ui.057"),
         url: `file://${filePath}`,
         type: "text/csv",
         filename: filename,
@@ -160,7 +161,7 @@ const BoardingTransactionsScreen = () => {
               <Pressable
                 onPress={exportToCSV}
                 accessibilityRole="button"
-                accessibilityLabel="Export boarding history"
+                accessibilityLabel={t("ui.054")}
                 className="h-10 w-10 items-center justify-center rounded-full"
               >
                 <Icon name="download-outline" size={24} color={iconColor} />
@@ -191,7 +192,7 @@ const BoardingTransactionsScreen = () => {
           ) : isError ? (
             <View className="flex-1 items-center justify-center">
               <Text className="text-muted-foreground mb-4">
-                Failed to load boarding transactions
+                {t("ui.055")}
               </Text>
               <Pressable onPress={() => refetch()} className="px-4 py-2 bg-primary rounded-lg">
                 <Text className="text-primary-foreground">Retry</Text>
@@ -201,7 +202,7 @@ const BoardingTransactionsScreen = () => {
             <View className="flex-1 items-center justify-center">
               <Icon name="boat-outline" size={48} color="#666" />
               <Text className="text-muted-foreground mt-4 text-center">
-                No boarding transactions found
+                {t("ui.056")}
               </Text>
             </View>
           ) : (

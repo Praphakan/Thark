@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import React from "react";
 import { Pressable, View } from "react-native";
 import { Text } from "./ui/text";
@@ -108,7 +109,7 @@ export const SendConfirmation: React.FC<SendConfirmationProps> = ({
       case "lightning":
         return "Lightning";
       case "lnurl":
-        return "Lightning Address";
+        return t("ui.027");
       case "onchain":
         return "On-chain";
       case "offer":
@@ -144,10 +145,10 @@ export const SendConfirmation: React.FC<SendConfirmationProps> = ({
   const resolvedDestination = getDestinationDisplay();
   const title = isLoading ? "Sending payment" : sendError ? "Send failed" : "Confirm send";
   const description = isLoading
-    ? "Keep Noah open while this completes."
+    ? t("ui.028")
     : sendError
-      ? "Review the error, then retry or cancel."
-      : "Review the route and fee before sending.";
+      ? t("ui.029")
+      : t("ui.030");
 
   return (
     <View>

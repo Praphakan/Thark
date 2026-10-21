@@ -138,7 +138,7 @@ const UnifiedPushScreen = () => {
             <Text className="font-bold mb-2">{t("up.selectDistributor")}</Text>
             {distributors.length === 0 ? (
               <Text className="text-sm text-muted-foreground">
-                No distributors detected. Install ntfy or another UnifiedPush distributor.
+                {t("ui.095")}
               </Text>
             ) : (
               distributors.map((d) => (

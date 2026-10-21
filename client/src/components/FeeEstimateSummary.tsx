@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import { Fragment } from "react";
 import type { BarkFeeEstimate } from "~/lib/paymentsApi";
 import { Text } from "~/components/ui/text";
@@ -31,7 +32,7 @@ export const FeeEstimateSummary = ({
   netLabel = "Recipient gets",
   feeLabel = "Estimated fee",
   grossLabel = "Total deducted",
-  unavailableText = "Fee estimate unavailable. The final fee will be calculated when you send.",
+  unavailableText = t("ui.023"),
   note = null,
   feeValueClassName,
   rowOrder = ["net", "fee", "gross"],

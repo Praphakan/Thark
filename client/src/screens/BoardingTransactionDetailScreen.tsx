@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import { View, Pressable, ScrollView, Linking } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import { Text } from "../components/ui/text";
@@ -259,14 +260,14 @@ export const BoardingTransactionDetailContent = ({
         <Text className="text-foreground text-lg font-semibold mb-3">Description</Text>
         <Text className="text-muted-foreground text-sm">
           {transaction.type === "onboarding"
-            ? "Boarding transaction to enter the Ark network. Your Bitcoin was moved from the onchain wallet to the offchain Ark balance."
-            : "Offboarding transaction to exit the Ark network. Your Ark balance was converted back to onchain Bitcoin."}
+            ? t("ui.050")
+            : t("ui.051")}
         </Text>
         {transaction.status === "pending" && (
           <Text className="text-yellow-500 text-sm mt-2">
             {transaction.type === "onboarding"
-              ? "This boarding request is being processed. It will be completed when the next Ark round starts."
-              : "This offboarding request is being processed. It will be completed when the next Ark round starts."}
+              ? t("ui.052")
+              : t("ui.053")}
           </Text>
         )}
       </View>

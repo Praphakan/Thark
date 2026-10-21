@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import { useEffect, useState } from "react";
 import { Linking, Pressable, View } from "react-native";
 import { Clock3 } from "lucide-react-native";
@@ -137,7 +138,7 @@ export const PendingRoundStatusBanner = () => {
   }
 
   const primaryRound = activeRounds[0];
-  const title = activeRounds.length === 1 ? "Round in progress" : "Rounds in progress";
+  const title = activeRounds.length === 1 ? t("ui.024") : t("ui.025");
   const message =
     activeRounds.length === 1
       ? `Round #${primaryRound.round_id} ${primaryRound.status}`

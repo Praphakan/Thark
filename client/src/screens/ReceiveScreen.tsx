@@ -685,7 +685,7 @@ const ReceiveScreen = () => {
 
             <View className="pt-1">
               <Text className="text-[11px] font-semibold uppercase tracking-[3px] text-muted-foreground">
-                Receive Bitcoin
+                {t("ui.084")}
               </Text>
               <Text className="mt-2 max-w-[320px] text-base leading-6 text-muted-foreground">
                 {t("recv.generatePrompt")}
@@ -697,7 +697,7 @@ const ReceiveScreen = () => {
                 <View className="flex-1">
                   {isGenerated ? (
                     <Text className="text-sm text-muted-foreground">
-                      Listening for payment until you clear or leave this screen.
+                      {t("ui.085")}
                     </Text>
                   ) : null}
                 </View>
@@ -793,11 +793,11 @@ const ReceiveScreen = () => {
                     </Text>
                   </Pressable>
                   <Text className="mt-3 max-w-[270px] text-center text-sm leading-6 text-muted-foreground">
-                    This QR includes every receive rail that generated successfully.
+                    {t("ui.086")}
                   </Text>
                   {isAmountlessLightningRequest ? (
                     <Text className="mt-2 max-w-[290px] text-center text-sm leading-6 text-muted-foreground">
-                      Amount required for Lightning.
+                      {t("ui.087")}
                     </Text>
                   ) : null}
                 </View>

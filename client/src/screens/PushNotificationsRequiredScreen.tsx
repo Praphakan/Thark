@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import React from "react";
 import { View, Linking } from "react-native";
 import { BellRing, Zap, RefreshCcw } from "lucide-react-native";
@@ -18,13 +19,13 @@ type PushNotificationsRequiredScreenProps = {
 
 const highlights = [
   {
-    title: "Refresh expiring VTXOs",
-    description: "We attempt to refresh VTXOs in the background to prevent them from expiring.",
+    title: t("ui.074"),
+    description: t("ui.075"),
     icon: RefreshCcw,
   },
   {
-    title: "Receive while app is closed",
-    description: "Lightning and Ark payments keep flowing, even in the background.",
+    title: t("ui.076"),
+    description: t("ui.077"),
     icon: Zap,
   },
 ];
@@ -43,8 +44,7 @@ export const PushNotificationsRequiredScreen = ({
           </View>
           <Text className="mt-6 text-3xl font-bold text-center">Turn on push notifications</Text>
           <Text className="mt-3 text-center text-muted-foreground">
-            Push notifications are critical for the app to function and enabling them helps prevent
-            VTXOs from expiring.
+            {t("ui.078")}
           </Text>
         </View>
 
@@ -67,7 +67,7 @@ export const PushNotificationsRequiredScreen = ({
 
         <View className="mt-10 space-y-4">
           <NativeNoahButton
-            label="Enable notifications"
+            label={t("ui.079")}
             onPress={onRequestPermission}
             isLoading={isRequesting}
             loadingLabel="Requesting..."
@@ -82,7 +82,7 @@ export const PushNotificationsRequiredScreen = ({
               fullWidth
             />
             <NativeNoahSecondaryButton
-              label="Open settings to allow notifications"
+              label={t("ui.080")}
               emphasis="ghost"
               onPress={() => Linking.openSettings()}
               disabled={isRequesting}

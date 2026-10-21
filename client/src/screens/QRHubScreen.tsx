@@ -230,10 +230,10 @@ const QRHubScreen = () => {
               ) : (
                 <View className="w-full rounded-[18px] border border-border/60 bg-card/70 px-4 py-5">
                   <Text className="text-lg font-semibold text-foreground">
-                    Adresse Lightning indisponible
+                    {t("ui.081")}
                   </Text>
                   <Text className="mt-2 text-sm leading-6 text-muted-foreground">
-                    Configurez votre adresse Lightning avant de partager votre QR.
+                    {t("ui.082")}
                   </Text>
                   <NativeNoahButton
                     label="Open Profile"
@@ -252,7 +252,7 @@ const QRHubScreen = () => {
                 </View>
                 <Text className="mt-5 text-xl font-bold text-foreground">{t("qr.scanToPay")}</Text>
                 <Text className="mt-2 max-w-[280px] text-center text-sm leading-6 text-muted-foreground">
-                  Scan a Bitcoin, Lightning, or Ark QR code and send from Thârk.
+                  {t("ui.083")}
                 </Text>
               </View>
             </Animated.View>

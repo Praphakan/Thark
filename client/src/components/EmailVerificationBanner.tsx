@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import React from "react";
 import { View, Pressable } from "react-native";
 import { ChevronRight, Mail, X } from "lucide-react-native";
@@ -23,19 +24,19 @@ export const EmailVerificationBanner: React.FC<EmailVerificationBannerProps> = (
           <View className="flex-row items-center gap-2">
             <Mail size={20} color={COLORS.BITCOIN_ORANGE} />
             <Text className="text-base font-semibold" style={{ color: COLORS.BITCOIN_ORANGE }}>
-              Add Emergency Email
+              {t("ui.020")}
             </Text>
           </View>
           <ChevronRight size={20} color={iconColor} />
         </View>
 
         <Text className="text-sm text-muted-foreground">
-          Optional alerts can help us reach you if your VTXOs need attention before they expire.
+          {t("ui.021")}
         </Text>
       </Pressable>
       <Pressable
         onPress={onDismiss}
-        accessibilityLabel="Dismiss emergency email prompt"
+        accessibilityLabel={t("ui.022")}
         className="absolute right-3 top-3 h-8 w-8 items-center justify-center rounded-full"
       >
         <X size={18} color={iconColor} />

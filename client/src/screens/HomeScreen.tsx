@@ -168,13 +168,13 @@ const HomeScreen = () => {
               <PauseCircle size={48} color="#dc2626" />
             </View>
             <Text className="text-2xl font-bold text-foreground mb-3 text-center">
-              Wallet Suspended
+              {t("ui.061")}
             </Text>
             <Text className="text-base text-muted-foreground text-center leading-6">
-              Your wallet is currently suspended. All wallet operations are disabled.
+              {t("ui.062")}
             </Text>
             <Text className="text-sm text-muted-foreground text-center mt-4">
-              Go to Settings → Danger Zone to resume your wallet.
+              {t("ui.063")}
             </Text>
             <Pressable
               onPress={() => navigation.navigate("Settings")}
@@ -259,7 +259,7 @@ const HomeScreen = () => {
               <AlertTitle>Error</AlertTitle>
               <AlertDescription>
                 {walletError
-                  ? "Failed to connect to wallet. Pull down to try again."
+                  ? t("ui.064")
                   : errorMessage}
               </AlertDescription>
             </Alert>
@@ -283,7 +283,7 @@ const HomeScreen = () => {
                   <View className="flex-row items-center justify-center px-4">
                     <Pressable
                       accessibilityRole="button"
-                      accessibilityLabel="Toggle balance details"
+                      accessibilityLabel={t("ui.065")}
                       accessibilityState={{ expanded: isOpen }}
                       onPress={() => setIsOpen((current) => !current)}
                       style={{ flexShrink: 1 }}
@@ -306,7 +306,7 @@ const HomeScreen = () => {
                       onPress={toggleHomeBalanceHidden}
                       accessibilityRole="button"
                       accessibilityLabel={
-                        isHomeBalanceHidden ? "Show wallet balance" : "Hide wallet balance"
+                        isHomeBalanceHidden ? t("ui.066") : t("ui.067")
                       }
                       hitSlop={12}
                       className="ml-3 h-8 w-8 items-center justify-center"
@@ -485,7 +485,7 @@ const HomeScreen = () => {
                     <View className="py-5">
                       <Text className="text-sm font-semibold text-foreground">{t("home.noActivity")}</Text>
                       <Text className="mt-1 text-sm text-muted-foreground">
-                        Recevez ou envoyez des bitcoins pour commencer.
+                        {t("ui.068")}
                       </Text>
                     </View>
                   ) : (

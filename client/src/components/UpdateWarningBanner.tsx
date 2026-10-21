@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import React from "react";
 import { View, Text, Pressable, Platform, Linking } from "react-native";
 import { ChevronRight } from "lucide-react-native";
@@ -40,7 +41,7 @@ export const UpdateWarningBanner: React.FC<UpdateWarningBannerProps> = ({
         </View>
 
         <Text className="text-sm text-gray-300 mb-3">
-          Please update to the latest version of the app for bug fixes and improvements.
+          {t("ui.031")}
         </Text>
 
         <View className="pt-3 border-t border-orange-500/20 gap-2">

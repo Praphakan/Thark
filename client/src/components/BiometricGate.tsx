@@ -121,13 +121,13 @@ const BiometricGate: React.FC<BiometricGateProps> = ({ children }) => {
       <Icon name="lock-closed-outline" size={64} color={iconColor} />
       <Text className="text-2xl font-bold text-foreground mt-6 mb-2">Noah is Locked</Text>
       <Text className="text-muted-foreground text-center mb-8">
-        Authenticate to access your wallet
+        {t("ui.016")}
       </Text>
       <NativeNoahButton
         label="Unlock"
         onPress={performAuth}
         isLoading={isAuthenticating}
-        loadingLabel="Authenticating..."
+        loadingLabel={t("ui.017")}
       />
     </View>
   );

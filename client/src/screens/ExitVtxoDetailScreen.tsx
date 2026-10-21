@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import React from "react";
 import { Linking, Pressable, ScrollView, View } from "react-native";
 import { useNavigation, useRoute, type RouteProp } from "@react-navigation/native";
@@ -219,7 +220,7 @@ const ExitVtxoDetailScreen = () => {
           <View className="rounded-lg border border-border bg-card p-4">
             <Text className="text-base font-semibold text-foreground">Exit not found</Text>
             <Text className="mt-2 text-sm leading-5 text-muted-foreground">
-              This VTXO is not currently tracked as an emergency exit.
+              {t("ui.059")}
             </Text>
           </View>
         ) : (

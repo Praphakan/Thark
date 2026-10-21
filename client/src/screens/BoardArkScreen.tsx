@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import React, { useState, useEffect, useMemo } from "react";
 import {
   View,
@@ -186,7 +187,7 @@ const OnboardForm = ({
           setAmount(text);
           setIsMaxAmount(false);
         }}
-        placeholder="Enter amount in sats"
+        placeholder={t("ui.032")}
         keyboardType="numeric"
         className="flex-1 border-border bg-card p-4 rounded-lg text-foreground"
       />
@@ -225,7 +226,7 @@ const BoardFeeEstimateSummary = ({
 
   return (
     <FeeEstimateBox
-      title="Rough fee estimate"
+      title={t("ui.033")}
       isLoading={isLoading || isWaitingForDebounce}
       compact
     >
@@ -239,7 +240,7 @@ const BoardFeeEstimateSummary = ({
             </Text>
           ) : estimate.is_max_amount ? (
             <Text className="mb-2 text-xs leading-5 text-muted-foreground">
-              Max estimate leaves room for the onchain transaction fee.
+              {t("ui.034")}
             </Text>
           ) : null}
           <FeeEstimateRow
@@ -249,21 +250,21 @@ const BoardFeeEstimateSummary = ({
           />
           <FeeEstimateSeparator />
           <FeeEstimateRow
-            label="Ark boarding fee"
+            label={t("ui.004")}
             value={formatBitcoinAmount(estimate.fee_sat)}
             compact
             valueClassName="text-red-500"
           />
           <FeeEstimateSeparator />
           <FeeEstimateRow
-            label="Estimated onchain fee"
+            label={t("ui.005")}
             value={formatBitcoinAmount(estimate.estimated_onchain_fee_sat)}
             compact
             valueClassName="text-red-500"
           />
           <FeeEstimateSeparator />
           <FeeEstimateRow
-            label="Stays in onchain wallet"
+            label={t("ui.006")}
             value={formatBitcoinAmount(estimate.estimated_remaining_onchain_sat)}
             compact
             valueClassName={
@@ -272,7 +273,7 @@ const BoardFeeEstimateSummary = ({
           />
           <FeeEstimateSeparator />
           <FeeEstimateRow
-            label="Ark amount after fee"
+            label={t("ui.007")}
             value={formatBitcoinAmount(estimate.net_amount_sat)}
             compact
             valueClassName="text-green-500"
@@ -297,21 +298,21 @@ const BoardFeeEstimateSummary = ({
           />
           <FeeEstimateSeparator />
           <FeeEstimateRow
-            label="Ark boarding fee"
+            label={t("ui.004")}
             value="Not estimated"
             compact
             valueClassName="text-muted-foreground"
           />
           <FeeEstimateSeparator />
           <FeeEstimateRow
-            label="Estimated onchain fee"
+            label={t("ui.005")}
             value={formatBitcoinAmount(unavailable.estimated_onchain_fee_sat)}
             compact
             valueClassName="text-red-500"
           />
           <FeeEstimateSeparator />
           <FeeEstimateRow
-            label="Stays in onchain wallet"
+            label={t("ui.006")}
             value={formatBitcoinAmount(unavailable.estimated_remaining_onchain_sat)}
             compact
             valueClassName={
@@ -320,14 +321,14 @@ const BoardFeeEstimateSummary = ({
           />
           <FeeEstimateSeparator />
           <FeeEstimateRow
-            label="Ark amount after fee"
+            label={t("ui.007")}
             value="Not estimated"
             compact
             valueClassName="text-muted-foreground"
           />
           <FeeEstimateSeparator />
           <FeeEstimateRow
-            label="Minimum board amount"
+            label={t("ui.035")}
             value={formatBitcoinAmount(unavailable.minimum_board_amount_sat)}
             compact
           />
@@ -338,7 +339,7 @@ const BoardFeeEstimateSummary = ({
         </>
       ) : error ? (
         <Text className="text-sm leading-5 text-muted-foreground">
-          Fee estimate unavailable. The final fee will be calculated when you board.
+          {t("ui.036")}
         </Text>
       ) : (
         <Text className="text-sm text-muted-foreground">Estimating fees...</Text>
@@ -355,13 +356,13 @@ const MinimumBoardAmountSummary = ({
   const formatBitcoinAmount = useBitcoinAmountFormatter();
 
   return (
-    <FeeEstimateBox title="Minimum board amount" compact>
+    <FeeEstimateBox title={t("ui.035")} compact>
       <Text className="text-sm leading-5 text-muted-foreground">
         Enter at least {formatBitcoinAmount(minimumBoardAmountSat)} to board to Ark.
       </Text>
       <FeeEstimateSeparator className="mt-2" />
       <FeeEstimateRow
-        label="Minimum board amount"
+        label={t("ui.035")}
         value={formatBitcoinAmount(minimumBoardAmountSat)}
         compact
       />
@@ -622,14 +623,14 @@ const BoardArkScreen = () => {
     if (!address || !btcValidation.valid) {
       showAlert({
         title: "Invalid Address",
-        description: "Please enter a valid Bitcoin address.",
+        description: t("ui.037"),
       });
       return;
     }
 
     if (!isNetworkMatch(btcValidation.network, "onchain")) {
       showAlert({
-        title: "Network Mismatch",
+        title: t("ui.038"),
         description: `Please enter a ${APP_VARIANT} address. Detected ${btcValidation.network} address.`,
       });
       return;
@@ -659,7 +660,7 @@ const BoardArkScreen = () => {
     if (isNaN(amountSat) || amountSat <= 0) {
       showAlert({
         title: "Invalid Amount",
-        description: "Please enter a valid amount to board.",
+        description: t("ui.039"),
       });
       return;
     }
@@ -677,8 +678,8 @@ const BoardArkScreen = () => {
     }
     if (amountSat > onchainBalance) {
       showAlert({
-        title: "Insufficient Funds",
-        description: "The amount exceeds your on-chain balance.",
+        title: t("ui.040"),
+        description: t("ui.041"),
       });
       return;
     }
@@ -744,7 +745,7 @@ const BoardArkScreen = () => {
                   transactions.
                 </Text>
                 <BalanceDisplay
-                  title="Confirmed On-chain Balance"
+                  title={t("ui.042")}
                   amount={onchainBalance}
                   pendingAmount={onchainPendingBalance}
                   isLoading={isBalanceLoading}
@@ -769,10 +770,10 @@ const BoardArkScreen = () => {
             ) : (
               <>
                 <Text className="text-muted-foreground text-center mb-5">
-                  Exit Ark and send your off-chain balance to an on-chain Bitcoin address.
+                  {t("ui.043")}
                 </Text>
                 <BalanceDisplay
-                  title="Confirmed Off-chain Balance"
+                  title={t("ui.044")}
                   amount={offchainBalance}
                   pendingAmount={offchainPendingBalance}
                   isLoading={isBalanceLoading}
@@ -786,7 +787,7 @@ const BoardArkScreen = () => {
                     <Input
                       value={address}
                       onChangeText={setAddress}
-                      placeholder="Enter Bitcoin address"
+                      placeholder={t("ui.045")}
                       className="border-0 bg-transparent p-0 text-foreground"
                       autoCapitalize="none"
                       autoCorrect={false}
@@ -803,10 +804,10 @@ const BoardArkScreen = () => {
                       />
                       <View className="flex-1">
                         <Text className="text-sm font-semibold text-amber-700 dark:text-amber-300">
-                          Use an external address
+                          {t("ui.046")}
                         </Text>
                         <Text className="mt-0.5 text-xs leading-4 text-amber-700/90 dark:text-amber-200/90">
-                          Sending to your Thârk wallet address can board the funds back into Ark.
+                          {t("ui.047")}
                         </Text>
                       </View>
                     </View>
@@ -821,11 +822,11 @@ const BoardArkScreen = () => {
                       error={offboardFeeEstimateQuery.error}
                       netLabel="You receive"
                       feeLabel="Estimated fee"
-                      grossLabel="Total offboarded"
+                      grossLabel={t("ui.048")}
                       compact
                       feeValueClassName="text-red-500"
                       rowOrder={["gross", "fee", "net"]}
-                      unavailableText="Fee estimate unavailable. The final fee will be calculated when you offboard."
+                      unavailableText={t("ui.049")}
                     />
                   ) : null}
                 </View>

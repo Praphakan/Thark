@@ -18,7 +18,7 @@ const OnboardingScreen = () => {
     <View className="flex-1 items-center justify-center bg-background p-5">
       <Text className="text-3xl font-bold mb-4 text-center">{t("onb.welcome")}</Text>
       <Text className="text-lg text-muted-foreground mb-10 text-center">
-        Create a new wallet or restore an existing one.
+        {t("ui.069")}
       </Text>
       <View>
         <View className="flex-row justify-center">

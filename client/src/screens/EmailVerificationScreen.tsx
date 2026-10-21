@@ -218,10 +218,8 @@ const EmailVerificationScreen = () => {
           <>
             <Text className="text-muted-foreground mb-6">
               {isChangingEmail
-                ? `Your current email${
-                    currentEmailAddress ? `, ${currentEmailAddress},` : ""
-                  } will stay active until the new email is verified.`
-                : "L'email est optionnel. Thârk l'utilise uniquement pour les messages urgents de sécurité du wallet, par exemple quand vos VTXOs approchent de l'expiration et que vous devez vous connecter pour les rafraîchir."}
+                ? t("em.changeInfo", { email: currentEmailAddress ? `, ${currentEmailAddress},` : "" })
+                : t("em.optionalInfo")}
             </Text>
 
             <View className="bg-card rounded-2xl border border-border p-5 space-y-5">
@@ -332,7 +330,7 @@ const EmailVerificationScreen = () => {
 
         {codeSent && (
           <Text className="text-xs text-muted-foreground text-center mt-8">
-            The verification code will expire in 10 minutes.
+            {t("ui.058")}
           </Text>
         )}
       </View>

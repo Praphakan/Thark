@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import React from "react";
 import { TouchableOpacity, View } from "react-native";
 import { ParsedBip321 } from "../lib/sendUtils";
@@ -87,7 +88,7 @@ export const Bip321Picker = ({
             Payment route
           </Text>
           <Text className="text-xs font-medium uppercase tracking-[2px] text-muted-foreground">
-            Parsed request
+            {t("ui.019")}
           </Text>
         </View>
       ) : null}
@@ -131,7 +132,7 @@ export const Bip321Picker = ({
           }}
         >
           <Text className="text-xs font-semibold uppercase tracking-[2px] text-muted-foreground">
-            Selected destination
+            {t("ui.018")}
           </Text>
           <Text className="mt-2 text-base font-semibold text-foreground">
             {selectedOption.label}

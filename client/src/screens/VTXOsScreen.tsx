@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import { View, Pressable, ScrollView } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useState } from "react";
@@ -402,15 +403,15 @@ const VTXOsScreen = () => {
                 {filter === "all"
                   ? "No VTXOs found"
                   : filter === "active"
-                    ? "No active VTXOs found"
+                    ? t("ui.096")
                     : filter === "expiring"
-                      ? "No expiring VTXOs found"
+                      ? t("ui.097")
                       : filter === "expired"
-                        ? "No expired VTXOs found"
-                        : "No locked VTXOs found"}
+                        ? t("ui.098")
+                        : t("ui.099")}
               </Text>
               <Text className="text-muted-foreground text-sm mt-2 text-center">
-                You have no VTXOs.
+                {t("ui.100")}
               </Text>
             </View>
           ) : (
@@ -503,7 +504,7 @@ const VTXOsScreen = () => {
 
         <ConfirmationDialog
           title="Refresh VTXOs?"
-          description="This refreshes the selected VTXOs in a delegated Ark round."
+          description={t("ui.101")}
           confirmText="Refresh"
           cancelText="Cancel"
           confirmVariant="default"
@@ -558,7 +559,7 @@ const VTXOsScreen = () => {
                 />
                 <View className="h-px bg-border/70" />
                 <RefreshPlanRow
-                  label="Amount after fee"
+                  label={t("ui.102")}
                   value={formatBitcoinWithFiat(selectedAfterFeeSat)}
                   valueClassName="text-green-500"
                 />

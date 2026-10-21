@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import { useEffect } from "react";
 import { CheckCircle } from "lucide-react-native";
 import { StatusBannerStrip } from "~/components/StatusBannerStrip";
@@ -40,7 +41,7 @@ export const AutoBoardingStatusBanner = () => {
   return (
     <StatusBannerStrip
       className="mx-4 mt-3 mb-1"
-      title="Boarding completed"
+      title={t("ui.008")}
       message={`${formatAutoBoardThreshold(autoBoardSuccessBanner.netBoardAmountSat)} available in Ark`}
       icon={<CheckCircle size={16} color="#22c55e" />}
       tone="success"

@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import { memo, useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { ConfirmationDialog } from "~/components/ConfirmationDialog";
@@ -128,8 +129,8 @@ export const AutoBoardingService = memo(({ isReady }: AutoBoardingServiceProps) 
         setHasReportedAutoBoardPlanError(true);
         log.e("Auto-boarding failed to load Ark info", [arkInfoError]);
         showAlert({
-          title: "Auto-Boarding Failed",
-          description: "Unable to load Ark server info. Please try again later.",
+          title: t("ui.000"),
+          description: t("ui.001"),
         });
       }
       return;
@@ -161,8 +162,8 @@ export const AutoBoardingService = memo(({ isReady }: AutoBoardingServiceProps) 
             setHasReportedAutoBoardPlanError(true);
             log.e("Auto-boarding failed to estimate fees", [planResult.error]);
             showAlert({
-              title: "Auto-Boarding Failed",
-              description: "Unable to estimate boarding fees. Please try again later.",
+              title: t("ui.000"),
+              description: t("ui.002"),
             });
           }
           return;
@@ -250,7 +251,7 @@ export const AutoBoardingService = memo(({ isReady }: AutoBoardingServiceProps) 
   return (
     <ConfirmationDialog
       title="Board to Ark?"
-      description="Move available onchain funds into Ark while leaving a fee reserve in your onchain wallet."
+      description={t("ui.003")}
       confirmText="Yes, board"
       cancelText="No, turn off"
       confirmVariant="default"
@@ -295,24 +296,24 @@ export const AutoBoardingService = memo(({ isReady }: AutoBoardingServiceProps) 
             />
             <View className="h-px bg-border/70" />
             <AutoBoardPlanRow
-              label="Ark boarding fee"
+              label={t("ui.004")}
               value={formatBitcoinAmount(autoBoardPlan.arkFeeSat)}
               valueClassName="text-red-500"
             />
             <View className="h-px bg-border/70" />
             <AutoBoardPlanRow
-              label="Estimated onchain fee"
+              label={t("ui.005")}
               value={formatBitcoinAmount(autoBoardPlan.estimatedOnchainFeeSat)}
               valueClassName="text-red-500"
             />
             <View className="h-px bg-border/70" />
             <AutoBoardPlanRow
-              label="Stays in onchain wallet"
+              label={t("ui.006")}
               value={formatBitcoinAmount(autoBoardPlan.estimatedRemainingOnchainSat)}
             />
             <View className="h-px bg-border/70" />
             <AutoBoardPlanRow
-              label="Ark amount after fee"
+              label={t("ui.007")}
               value={formatBitcoinAmount(autoBoardPlan.netBoardAmountSat)}
               valueClassName="text-green-500"
             />

@@ -297,7 +297,7 @@ const SettingsScreen = () => {
               onPress={() => {}}
             />
           }
-          title="Reset Server Registration"
+          title={t("ui.090")}
           description={t("set.resetConfirm")}
           onConfirm={async () => {
             setResetError(null);

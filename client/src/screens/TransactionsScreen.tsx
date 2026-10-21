@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import { View, Pressable, ActivityIndicator } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Share from "react-native-share";
@@ -105,7 +106,7 @@ const TransactionsScreen = () => {
 
     const shareResult = await ResultAsync.fromPromise(
       Share.open({
-        title: "Export Transactions",
+        title: t("ui.093"),
         url: `file://${filePath}`,
         type: "text/csv",
         filename: filename,
@@ -158,7 +159,7 @@ const TransactionsScreen = () => {
               <Pressable
                 onPress={exportToCSV}
                 accessibilityRole="button"
-                accessibilityLabel="Export transactions"
+                accessibilityLabel={t("ui.094")}
                 className="h-10 w-10 items-center justify-center rounded-full"
               >
                 <Icon name="download-outline" size={24} color={iconColor} />

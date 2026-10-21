@@ -50,7 +50,7 @@ const RestoreWalletScreen = ({ navigation }: Props) => {
             </View>
             <View className="pt-8 items-center w-full">
               <Text className="text-lg text-muted-foreground mb-10 text-center">
-                Enter your 12-word seed phrase to restore your wallet.
+                {t("ui.088")}
               </Text>
               <TextInput
                 className="w-full h-24 bg-input rounded-lg p-4 text-foreground text-lg text-left"
