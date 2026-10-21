@@ -97,8 +97,8 @@ const config: { expo: ExpoConfig } = {
     ],
     ios: {
       supportsTablet: true,
-      bundleIdentifier: "com.noahwallet.mainnet",
-      scheme: "com.noahwallet.mainnet",
+      bundleIdentifier: "app.thark.wallet",
+      scheme: "app.thark.wallet",
       infoPlist: {
         UIBackgroundModes: ["remote-notification", "fetch"],
       },
@@ -110,7 +110,7 @@ const config: { expo: ExpoConfig } = {
           "./assets/thark/adaptive-icon.png",
         backgroundColor: "#000000",
       },
-      package: "com.noahwallet",
+      package: "app.thark.wallet",
       softwareKeyboardLayoutMode: "pan",
     },
     androidStatusBar: {

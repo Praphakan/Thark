@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "798188805132",
-    "project_id": "noah-wallet",
-    "storage_bucket": "noah-wallet.firebasestorage.app"
+    "project_number": "112972163654",
+    "project_id": "thark-e0fbb",
+    "storage_bucket": "thark-e0fbb.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:798188805132:android:f1f15d689f21f534c5a229",
+        "mobilesdk_app_id": "1:112972163654:android:bcf5bd6c53074fb2983847",
         "android_client_info": {
-          "package_name": "com.noahwallet"
+          "package_name": "app.thark.wallet"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAqUfhVtqS9piBZGjhKfB1x-UeAcVi8FoU"
+          "current_key": "AIzaSyDDvwkb8Q2ctok1XCgH4ERw0skb-viy3CU"
         }
       ],
       "services": {
@@ -26,15 +26,15 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:798188805132:android:4de001844d8ae0c7c5a229",
+        "mobilesdk_app_id": "1:112972163654:android:a7bbaae6cc50074d983847",
         "android_client_info": {
-          "package_name": "com.noahwallet.mainnet"
+          "package_name": "app.thark.wallet.regtest"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAqUfhVtqS9piBZGjhKfB1x-UeAcVi8FoU"
+          "current_key": "AIzaSyDDvwkb8Q2ctok1XCgH4ERw0skb-viy3CU"
         }
       ],
       "services": {
@@ -45,34 +45,15 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:798188805132:android:d9e34e3fa9af010ec5a229",
+        "mobilesdk_app_id": "1:112972163654:android:98d1c395c538b5ed983847",
         "android_client_info": {
-          "package_name": "com.noahwallet.regtest"
+          "package_name": "app.thark.wallet.signet"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAqUfhVtqS9piBZGjhKfB1x-UeAcVi8FoU"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:798188805132:android:5a0ecd3d3dca8137c5a229",
-        "android_client_info": {
-          "package_name": "com.noahwallet.signet"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAqUfhVtqS9piBZGjhKfB1x-UeAcVi8FoU"
+          "current_key": "AIzaSyDDvwkb8Q2ctok1XCgH4ERw0skb-viy3CU"
         }
       ],
       "services": {

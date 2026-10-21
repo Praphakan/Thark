@@ -129,7 +129,7 @@ android {
 
     namespace 'com.noahwallet'
     defaultConfig {
-        applicationId 'com.noahwallet'
+        applicationId 'app.thark.wallet'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 26
@@ -141,21 +141,21 @@ android {
     productFlavors {
         signet {
             dimension 'version'
-            applicationId 'com.noahwallet.signet'
+            applicationId 'app.thark.wallet.signet'
             versionNameSuffix "-signet"
             resValue "string", "app_name", "Thârk (Signet)"
             buildConfigField "String", "APP_VARIANT", '"signet"'
         }
         regtest {
             dimension 'version'
-            applicationId 'com.noahwallet.regtest'
+            applicationId 'app.thark.wallet.regtest'
             versionNameSuffix "-regtest"
             resValue "string", "app_name", "Thârk (Regtest)"
             buildConfigField "String", "APP_VARIANT", '"regtest"'
         }
         mainnet {
             dimension 'version'
-            applicationId 'com.noahwallet.mainnet'
+            applicationId 'app.thark.wallet'
             resValue "string", "app_name", "Thârk"
             buildConfigField "String", "APP_VARIANT", '"mainnet"'
         }
