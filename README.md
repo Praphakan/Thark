@@ -1,4 +1,4 @@
-# Thârk
+# THâRK
 
 <img width="1244" height="520" alt="Capture d’écran 2026-10-21 à 20 40 54" src="https://github.com/user-attachments/assets/0a6ba9b3-ad13-4107-8226-25bc936adccf" />
 
