@@ -227,7 +227,7 @@ const EmailVerificationScreen = () => {
             <View className="bg-card rounded-2xl border border-border p-5 space-y-5">
               <View>
                 <Text className="text-xs uppercase tracking-widest text-muted-foreground mb-2">
-                  Email Address
+                  {t("em.emailAddressLabel")}
                 </Text>
                 <Input
                   value={email}
@@ -268,7 +268,7 @@ const EmailVerificationScreen = () => {
 
             <View className="bg-card rounded-2xl border border-border p-5">
               <Text className="text-xs uppercase tracking-widest text-muted-foreground mb-4 text-center">
-                Enter Verification Code
+                {t("em.enterCode")}
               </Text>
               <CodeField
                 ref={ref}

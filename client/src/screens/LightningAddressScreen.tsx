@@ -89,12 +89,12 @@ const LightningAddressScreen = () => {
         )}
         <View className="mt-10">
           <Text className="text-muted-foreground mb-3">
-            Choisissez un nom d'utilisateur ou laissez-nous en attribuer un.
+            {t("ln.chooseUsernameDesc")}
           </Text>
           <View className="bg-card rounded-2xl border border-border p-5 space-y-5">
             <View>
               <Text className="text-xs uppercase tracking-widest text-muted-foreground mb-2">
-                Nom d'utilisateur
+                {t("ln.username")}
               </Text>
               <Input
                 value={username}
