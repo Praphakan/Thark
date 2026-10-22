@@ -28,7 +28,7 @@ import { useTransactionStore } from "../store/transactionStore";
 import { useBackupStore } from "~/store/backupStore";
 import { ResultAsync } from "neverthrow";
 import logger from "~/lib/log";
-import { processPendingRefunds, processTakerPending } from "~/lib/openpleb";
+import { processPendingRefunds, processTakerPending, isTakerModeEnabled, syncTakerPush } from "~/lib/openpleb";
 
 const log = logger("useWallet");
 
@@ -67,6 +67,7 @@ export function useLoadWallet() {
         // (offres payées sans preneur, même si l'app avait été fermée)
         void processPendingRefunds().catch(() => {});
         void processTakerPending().catch(() => {});
+        if (isTakerModeEnabled()) void syncTakerPush(true);
       }
     },
     onError: (error: Error) => {

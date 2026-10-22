@@ -1,3 +1,5 @@
+import { t } from "~/lib/i18n";
+import * as Notifications from "expo-notifications";
 /**
  * Thârk ↔ OpenPleb — Module de connexion au pont PromptPay/Lightning.
  */
@@ -590,5 +592,38 @@ export async function redeemTakerRewardIfAny(offerId: number): Promise<number> {
     throw e;
   } finally {
     rewardInFlight.delete(offerId);
+  }
+}
+
+
+// ── Notifications push du mode taker ───────────────────────
+const TAKER_PUSH_TOKEN_KEY = "openpleb.taker.pushToken";
+
+/** Inscrit (ou désinscrit) ce téléphone aux alertes de nouvelles offres. */
+export async function syncTakerPush(enable: boolean): Promise<void> {
+  try {
+    if (enable) {
+      const perm = await Notifications.requestPermissionsAsync();
+      if (!perm.granted) return;
+      const token = String((await Notifications.getDevicePushTokenAsync()).data);
+      const lang = t("earn.title") === "Gagner des sats" ? "fr" : "en";
+      const res = await fetch(`${OPENPLEB_API}/takers/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, pubkey: takerPubKey(), lang }),
+      });
+      if (res.ok) mmkv.set(TAKER_PUSH_TOKEN_KEY, token);
+    } else {
+      const token = mmkv.getString(TAKER_PUSH_TOKEN_KEY);
+      if (!token) return;
+      await fetch(`${OPENPLEB_API}/takers/unregister`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token }),
+      });
+      mmkv.set(TAKER_PUSH_TOKEN_KEY, "");
+    }
+  } catch (e: any) {
+    console.warn("[takerPush]", e?.message ?? String(e));
   }
 }

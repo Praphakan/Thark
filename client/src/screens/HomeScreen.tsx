@@ -1,3 +1,5 @@
+import * as Notifications from "expo-notifications";
+let lastHandledNotifId: string | null = null;
 import { View, ScrollView, RefreshControl, Pressable } from "react-native";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -78,6 +80,17 @@ const HomeScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
   useIsFocused(); // relit le réglage au retour sur l'accueil
   const takerMode = isTakerModeEnabled();
+  // Toucher une alerte "Nouvelle offre" ouvre l'écran Gagner des sats
+  const lastNotif = Notifications.useLastNotificationResponse();
+  useEffect(() => {
+    const req: any = lastNotif?.notification?.request;
+    if (!req) return;
+    const screen = req.content?.data?.screen ?? req.trigger?.remoteMessage?.data?.screen;
+    if (screen === "Earn" && lastHandledNotifId !== req.identifier) {
+      lastHandledNotifId = req.identifier;
+      navigation.navigate("Earn");
+    }
+  }, [lastNotif]);
   const iconColor = useIconColor();
   const formatBitcoinAmount = useBitcoinAmountFormatter();
   const parentNavigation = navigation.getParent<NavigationProp<TabParamList>>();

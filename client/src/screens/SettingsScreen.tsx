@@ -1,5 +1,5 @@
 import { t } from "~/lib/i18n";
-import { isTakerModeEnabled, setTakerModeEnabled } from "~/lib/openpleb";
+import { isTakerModeEnabled, setTakerModeEnabled, syncTakerPush } from "~/lib/openpleb";
 import { Linking, Pressable, ScrollView, View, Image } from "react-native";
 import Constants from "expo-constants";
 import { useWalletStore } from "../store/walletStore";
@@ -449,7 +449,7 @@ const SettingsScreen = () => {
               </View>
               <NativeSwitch
                 value={takerMode}
-                onValueChange={(v: boolean) => { setTakerModeEnabled(v); setTakerMode(v); }}
+                onValueChange={(v: boolean) => { setTakerModeEnabled(v); setTakerMode(v); void syncTakerPush(v); }}
               />
             </View>
             <View className="p-4 border-b border-border bg-card rounded-lg mb-2 flex-row justify-between items-center">
