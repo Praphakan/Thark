@@ -1,3 +1,4 @@
+import { useGetExpiringVtxos as useExpiringForBanner, useRefreshExpiringVtxos as useRefreshForBanner } from "~/hooks/useWallet";
 import * as Notifications from "expo-notifications";
 let lastHandledNotifId: string | null = null;
 import { View, ScrollView, RefreshControl, Pressable } from "react-native";
@@ -80,6 +81,9 @@ const HomeScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
   useIsFocused(); // relit le réglage au retour sur l'accueil
   const takerMode = isTakerModeEnabled();
+  const expiringForBanner = useExpiringForBanner();
+  const refreshForBanner = useRefreshForBanner();
+  const vtxosToRefresh = ((expiringForBanner.data as any[]) ?? []).filter((v) => String(v.state) === "Spendable").length;
   // Toucher une alerte "Nouvelle offre" ouvre l'écran Gagner des sats
   const lastNotif = Notifications.useLastNotificationResponse();
   useEffect(() => {
@@ -372,6 +376,21 @@ const HomeScreen = () => {
                     <Text className="mt-2 text-sm font-semibold">{t("home.thaiQr")}</Text>
                   </Pressable>
                 </View>
+                {vtxosToRefresh > 0 ? (
+                  <Pressable
+                    className="mt-3 flex-row items-center p-4 rounded-2xl"
+                    style={{ backgroundColor: "#F7931A20", borderWidth: 1, borderColor: COLORS.BITCOIN_ORANGE, opacity: refreshForBanner.isPending ? 0.5 : 1 }}
+                    onPress={() => refreshForBanner.mutate()}
+                    disabled={refreshForBanner.isPending}
+                    accessibilityRole="button"
+                  >
+                    <Icon name="refresh-circle-outline" size={26} color={COLORS.BITCOIN_ORANGE} />
+                    <View className="ml-3 flex-1">
+                      <Text className="text-base font-semibold">{t("vtxo.bannerTitle")}</Text>
+                      <Text className="text-xs text-muted-foreground">{t("vtxo.bannerSub")}</Text>
+                    </View>
+                  </Pressable>
+                ) : null}
                 {getPendingOffers().length > 0 ? (
                   <Pressable
                     className="mt-3 flex-row items-center p-4 rounded-2xl"

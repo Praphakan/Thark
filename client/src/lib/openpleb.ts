@@ -1,3 +1,6 @@
+import { AppState } from "react-native";
+import { vtxos as listVtxosForGuard } from "react-native-nitro-ark";
+import { getExpiringVtxos as getExpiringForGuard, maintenanceWithOnchainDelegated as refreshForGuard } from "~/lib/walletApi";
 import { t } from "~/lib/i18n";
 import * as Notifications from "expo-notifications";
 /**
@@ -170,6 +173,7 @@ async function cashuFetch<T = unknown>(args: any): Promise<T> {
 }
 
 export async function redeemRefundToken(refundToken: string): Promise<number> {
+  setTimeout(() => void guardVtxos("paiement reçu"), 20000);
   // 1. Décoder le token (mint + proofs)
   // Nouveau format de keyset : le jeton ne contient qu'un ID abrégé,
   // il faut la liste des keysets du mint pour le décoder.
@@ -626,4 +630,88 @@ export async function syncTakerPush(enable: boolean): Promise<void> {
   } catch (e: any) {
     console.warn("[takerPush]", e?.message ?? String(e));
   }
+}
+
+
+// ── Garde des VTXOs : rafraîchissement automatique + rappel local ──
+// Les VTXOs Ark expirent (1 à 3 jours pour ceux reçus via Lightning, ~28 jours après
+// un rafraîchissement). Noah comptait sur son serveur pour réveiller l'app ; Thârk
+// s'en charge seul : à l'ouverture, au retour dans l'app, et après chaque paiement reçu.
+const GUARD_LAST_KEY = "thark.vtxoRefresh.last";
+const REMINDER_ID_KEY = "thark.expiryReminder.id";
+const REFRESH_WINDOW_BLOCKS = 288; // seuil de rafraîchissement de Noah (~2 jours)
+let guardBusy = false;
+let guardStarted = false;
+
+async function fetchTipHeight(): Promise<number | null> {
+  for (const u of ["https://mempool.second.tech/api/blocks/tip/height", "https://mempool.space/api/blocks/tip/height"]) {
+    try {
+      const r = await fetch(u);
+      if (r.ok) {
+        const n = Number((await r.text()).trim());
+        if (n > 0) return n;
+      }
+    } catch {}
+  }
+  return null;
+}
+
+async function scheduleExpiryReminder(): Promise<void> {
+  const prev = mmkv.getString(REMINDER_ID_KEY);
+  if (prev) {
+    await Notifications.cancelScheduledNotificationAsync(prev).catch(() => {});
+    mmkv.set(REMINDER_ID_KEY, "");
+  }
+  const spendable = (await listVtxosForGuard()).filter((v: any) => String(v.state) === "Spendable");
+  if (!spendable.length) return;
+  const perm = await Notifications.getPermissionsAsync();
+  if (!perm.granted) return;
+  const tip = await fetchTipHeight();
+  if (!tip) return;
+  const firstExpiry = Math.min(...spendable.map((v: any) => Number(v.expiry_height)));
+  // Rappel quand le premier VTXO entre dans la fenêtre de rafraîchissement (marge de 4 h)
+  const seconds = Math.max(3600, (firstExpiry - REFRESH_WINDOW_BLOCKS - tip) * 600 + 4 * 3600);
+  const id = await Notifications.scheduleNotificationAsync({
+    content: { title: t("vtxo.remindTitle"), body: t("vtxo.remindBody"), data: { screen: "Home" } },
+    trigger: { type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, seconds: Math.round(seconds), channelId: "default" } as any,
+  });
+  mmkv.set(REMINDER_ID_KEY, id);
+  console.log(`[vtxoGuard] rappel programmé dans ${Math.round(seconds / 3600)} h (expiration au bloc ${firstExpiry}, bloc actuel ${tip})`);
+}
+
+/** Rafraîchit les VTXOs proches de l'expiration (ou expirés), puis reprogramme le rappel. */
+export async function guardVtxos(reason: string): Promise<void> {
+  if (guardBusy) return;
+  guardBusy = true;
+  try {
+    const exp = await getExpiringForGuard();
+    if (exp.isOk()) {
+      const due = (exp.value as any[]).filter((v) => String(v.state) === "Spendable");
+      const last = Number(mmkv.getString(GUARD_LAST_KEY) ?? 0);
+      if (due.length && Date.now() - last > 10 * 60 * 1000) {
+        const r = await refreshForGuard();
+        if (r.isOk()) {
+          mmkv.set(GUARD_LAST_KEY, String(Date.now()));
+          console.log(`[vtxoGuard] rafraîchissement programmé (${reason}, ${due.length} VTXO)`);
+        } else {
+          console.warn("[vtxoGuard] rafraîchissement refusé :", (r.error as any)?.message ?? String(r.error));
+        }
+      }
+    }
+    await scheduleExpiryReminder();
+  } catch (e: any) {
+    console.warn("[vtxoGuard]", e?.message ?? String(e));
+  } finally {
+    guardBusy = false;
+  }
+}
+
+/** À appeler une fois le wallet chargé : garde immédiate + à chaque retour dans l'app. */
+export function startVtxoGuard(): void {
+  void guardVtxos("ouverture");
+  if (guardStarted) return;
+  guardStarted = true;
+  AppState.addEventListener("change", (state) => {
+    if (state === "active") void guardVtxos("retour dans l'app");
+  });
 }

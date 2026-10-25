@@ -1,3 +1,4 @@
+import { t } from "~/lib/i18n";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useAlert } from "~/contexts/AlertProvider";
 import { useServerStore } from "../store/serverStore";
@@ -28,7 +29,7 @@ import { useTransactionStore } from "../store/transactionStore";
 import { useBackupStore } from "~/store/backupStore";
 import { ResultAsync } from "neverthrow";
 import logger from "~/lib/log";
-import { processPendingRefunds, processTakerPending, isTakerModeEnabled, syncTakerPush } from "~/lib/openpleb";
+import { processPendingRefunds, processTakerPending, isTakerModeEnabled, syncTakerPush, startVtxoGuard } from "~/lib/openpleb";
 
 const log = logger("useWallet");
 
@@ -67,6 +68,7 @@ export function useLoadWallet() {
         // (offres payées sans preneur, même si l'app avait été fermée)
         void processPendingRefunds().catch(() => {});
         void processTakerPending().catch(() => {});
+        startVtxoGuard();
         if (isTakerModeEnabled()) void syncTakerPush(true);
       }
     },
@@ -217,13 +219,13 @@ export function useRefreshExpiringVtxos() {
         queryClient.invalidateQueries({ queryKey: ["pending-rounds"] }),
       ]);
       showAlert({
-        title: "Refresh scheduled",
-        description: "A delegated refresh has been scheduled for eligible VTXOs.",
+        title: t("vtxo.scheduledTitle"),
+        description: t("vtxo.scheduledDesc"),
       });
     },
     onError: (error: Error) => {
       log.e("Failed to refresh expiring VTXOs", [error]);
-      showAlert({ title: "Failed to refresh VTXO", description: error.message });
+      showAlert({ title: t("vtxo.failedTitle"), description: error.message });
     },
   });
 }
