@@ -13,6 +13,7 @@ export const SUPPORTED_FIAT_CURRENCIES = [
   "INR",
   "MXN",
   "SGD",
+  "THB",
 ] as const;
 
 export type FiatCurrencyCode = (typeof SUPPORTED_FIAT_CURRENCIES)[number];
@@ -37,6 +38,7 @@ export const FIAT_CURRENCY_INFO: Record<FiatCurrencyCode, FiatCurrencyInfo> = {
   INR: { code: "INR", name: "Indian Rupee", symbol: "₹", decimals: 2 },
   MXN: { code: "MXN", name: "Mexican Peso", symbol: "MX$", decimals: 2 },
   SGD: { code: "SGD", name: "Singapore Dollar", symbol: "S$", decimals: 2 },
+  THB: { code: "THB", name: "Thai Baht", symbol: "฿", decimals: 0 },
 };
 
 export type FiatRates = Partial<Record<FiatCurrencyCode, number>>;

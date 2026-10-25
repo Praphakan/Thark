@@ -1,3 +1,4 @@
+import { OPENPLEB_BASE_URL } from "~/lib/openpleb";
 import { useQuery } from "@tanstack/react-query";
 import { getBlockheightEndpoint, REGTEST_CONFIG } from "~/constants";
 import ky from "ky";
@@ -22,6 +23,18 @@ const historicalBtcToFiatRateCache = new Map<
 >();
 
 export const getBtcToFiatRate = (currency: FiatCurrencyCode): ResultAsync<number, Error> => {
+  // Baht : cours du backend OpenPleb, le même que celui appliqué aux paiements de QR thaïs
+  if (currency === "THB") {
+    return ResultAsync.fromPromise(
+      fetch(`${OPENPLEB_BASE_URL}/api/v1/conversion`).then(async (r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const n = Number((await r.json())?.conversion);
+        if (!(n > 0)) throw new Error("Invalid conversion");
+        return n;
+      }),
+      (e) => new Error(`Failed to fetch BTC to THB rate: ${(e as Error).message}`),
+    );
+  }
   return ResultAsync.fromSafePromise(getFiatPrices()).andThen((result) => {
     if (result.isErr()) {
       return err(new Error(`Failed to fetch BTC to ${currency} rate: ${result.error.message}`));
@@ -131,6 +144,10 @@ const fetchHistoricalBtcToFiatRate = async (
   date: string,
   currency: FiatCurrencyCode,
 ): Promise<Result<HistoricalRateLookup, Error>> => {
+  // Baht : pas d'historique chez Noah, on utilise directement le cours actuel d'OpenPleb
+  if (currency === "THB") {
+    return getBtcToFiatRate(currency).map((rate) => ({ rate, cacheable: false }));
+  }
   const timestamp = Math.floor(new Date(date).getTime() / 1000);
   return ResultAsync.fromPromise(getHistoricalFiatPrice({ currency, timestamp }), (e) => e as Error)
     .andThen((result) => {
