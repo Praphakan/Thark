@@ -51,6 +51,14 @@ You can check it with `apksigner verify --print-certs thark-x.y.z.apk`, or let [
 3. **Settlement**: the maker confirms, or the payment auto-settles after a short dispute window. The taker receives the sats plus a fee, and the maker gets their bond back.
 4. **No taker?** The offer expires after 3 minutes and the maker is refunded automatically.
 
+## Important: one seed, one install
+
+Use each recovery phrase in **only one installation of Thârk at a time**. An Ark wallet is a live state, not just a key: if you restore the same phrase on a second phone (or in a second app), that copy starts from an older backup and will show "phantom" funds that the Ark server refuses, while the other copy keeps evolving.
+
+To move your wallet to a new phone: restore it on the new one, check that your balance is correct, then **delete the wallet from the old one** and stop using it.
+
+Also open Thârk at least every few days. Ark funds (VTXOs) must be refreshed before they expire. Thârk does it automatically when you open it and reminds you with a notification, but it cannot do it while it stays closed.
+
 ## Current limitations
 
 - Android only (iOS may come later).
