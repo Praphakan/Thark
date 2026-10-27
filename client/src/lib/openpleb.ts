@@ -640,6 +640,7 @@ export async function syncTakerPush(enable: boolean): Promise<void> {
 const GUARD_LAST_KEY = "thark.vtxoRefresh.last";
 const REMINDER_ID_KEY = "thark.expiryReminder.id";
 const REFRESH_WINDOW_BLOCKS = 288; // seuil de rafraîchissement de Noah (~2 jours)
+const REFRESHED_LIFETIME_BLOCKS = 4032; // durée de vie d'un VTXO rafraîchi (~28 jours)
 let guardBusy = false;
 let guardStarted = false;
 
@@ -656,11 +657,23 @@ async function fetchTipHeight(): Promise<number | null> {
   return null;
 }
 
-async function scheduleExpiryReminder(): Promise<void> {
+async function scheduleExpiryReminder(justRefreshed = false): Promise<void> {
   const prev = mmkv.getString(REMINDER_ID_KEY);
   if (prev) {
     await Notifications.cancelScheduledNotificationAsync(prev).catch(() => {});
     mmkv.set(REMINDER_ID_KEY, "");
+  }
+  if (justRefreshed) {
+    // Un rafraîchissement est en route : le rappel se cale sur la durée de vie du VTXO rafraîchi
+    if (!(await Notifications.getPermissionsAsync()).granted) return;
+    const secs = (REFRESHED_LIFETIME_BLOCKS - REFRESH_WINDOW_BLOCKS) * 600 + 4 * 3600;
+    const id = await Notifications.scheduleNotificationAsync({
+      content: { title: t("vtxo.remindTitle"), body: t("vtxo.remindBody"), data: { screen: "Home" } },
+      trigger: { type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, seconds: secs, channelId: "default" } as any,
+    });
+    mmkv.set(REMINDER_ID_KEY, id);
+    console.log(`[vtxoGuard] rappel programmé dans ${Math.round(secs / 86400)} jours (après rafraîchissement)`);
+    return;
   }
   const spendable = (await listVtxosForGuard()).filter((v: any) => String(v.state) === "Spendable");
   if (!spendable.length) return;
@@ -684,13 +697,16 @@ export async function guardVtxos(reason: string): Promise<void> {
   if (guardBusy) return;
   guardBusy = true;
   try {
+    let refreshing = false;
     const exp = await getExpiringForGuard();
     if (exp.isOk()) {
       const due = (exp.value as any[]).filter((v) => String(v.state) === "Spendable");
       const last = Number(mmkv.getString(GUARD_LAST_KEY) ?? 0);
+      if (due.length && Date.now() - last <= 10 * 60 * 1000) refreshing = true; // déjà lancé il y a peu
       if (due.length && Date.now() - last > 10 * 60 * 1000) {
         const r = await refreshForGuard();
         if (r.isOk()) {
+          refreshing = true;
           mmkv.set(GUARD_LAST_KEY, String(Date.now()));
           console.log(`[vtxoGuard] rafraîchissement programmé (${reason}, ${due.length} VTXO)`);
         } else {
@@ -698,7 +714,7 @@ export async function guardVtxos(reason: string): Promise<void> {
         }
       }
     }
-    await scheduleExpiryReminder();
+    await scheduleExpiryReminder(refreshing);
   } catch (e: any) {
     console.warn("[vtxoGuard]", e?.message ?? String(e));
   } finally {
